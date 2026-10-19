@@ -3,152 +3,110 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Interactivo - Ventas por Categoría</title>
-  <!-- Tailwind CSS CDN -->
+  <title>Dashboard en Vivo - Ventas y Repuestos</title>
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Chart.js para visualización en Canvas -->
+  <!-- Chart.js para gráficos en Canvas -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <!-- PapaParse para procesar CSV directamente -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-  <style>
-    body { font-family: 'Inter', sans-serif; }
-  </style>
+  <style> body { font-family: 'Inter', sans-serif; } </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen p-4 md:p-8">
 
   <div class="max-w-7xl mx-auto space-y-6">
 
-    <!-- Encabezado -->
+    <!-- Encabezado con estado de actualización -->
     <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200">
       <div>
-        <h1 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Ventas por Categoría y Ganancia</h1>
-        <p class="text-sm text-slate-500 mt-1">Dashboard interactivo con datos consolidados de la hoja de cálculo</p>
+        <h1 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Dashboard de Ventas en Tiempo Real</h1>
+        <p class="text-sm text-slate-500 mt-1">Sincronizado automáticamente con Google Sheets</p>
       </div>
       <div class="flex items-center gap-3">
-        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
-          ● Datos Sincronizados
+        <span id="syncStatus" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">
+          ● Cargando datos...
         </span>
-        <button onclick="window.print()" class="px-4 py-2 text-sm font-medium bg-white border border-slate-300 rounded-lg shadow-sm hover:bg-slate-50 transition">
-          Guardar / Imprimir
+        <button onclick="fetchSheetData()" class="px-4 py-2 text-sm font-medium bg-white border border-slate-300 rounded-lg shadow-sm hover:bg-slate-100 transition flex items-center gap-2">
+          <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          Actualizar ahora
         </button>
       </div>
     </header>
 
-    <!-- Tarjetas de Resumen Global (KPIs) -->
+    <!-- Tarjetas de KPIs -->
     <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
         <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Facturado Total</p>
-        <h2 class="text-2xl font-bold text-slate-900 mt-1" id="kpiFacturado">$83.763,48</h2>
-        <span class="text-xs text-blue-600 font-medium">Facturación bruta acumulada</span>
+        <h2 class="text-2xl font-bold text-slate-900 mt-1" id="kpiFacturado">--</h2>
+        <span class="text-xs text-blue-600 font-medium">Facturación bruta</span>
       </div>
 
       <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
         <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Ganancia Total</p>
-        <h2 class="text-2xl font-bold text-emerald-600 mt-1" id="kpiGanancia">$24.923,45</h2>
-        <span class="text-xs text-emerald-700 font-medium">Utilidad neta operativa</span>
+        <h2 class="text-2xl font-bold text-emerald-600 mt-1" id="kpiGanancia">--</h2>
+        <span class="text-xs text-emerald-700 font-medium">Utilidad acumulada</span>
       </div>
 
       <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
         <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Margen Promedio</p>
-        <h2 class="text-2xl font-bold text-indigo-600 mt-1" id="kpiMargen">29,75%</h2>
+        <h2 class="text-2xl font-bold text-indigo-600 mt-1" id="kpiMargen">--</h2>
         <span class="text-xs text-slate-500 font-medium">Rentabilidad global</span>
       </div>
 
       <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Unidades / Servicios</p>
-        <h2 class="text-2xl font-bold text-slate-900 mt-1" id="kpiCantidad">683,1</h2>
-        <span class="text-xs text-slate-500 font-medium">Items y horas facturadas</span>
+        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Cantidad / Horas</p>
+        <h2 class="text-2xl font-bold text-slate-900 mt-1" id="kpiCantidad">--</h2>
+        <span class="text-xs text-slate-500 font-medium">Items procesados</span>
       </div>
     </section>
 
-    <!-- Filtro interactivo de Categorías -->
-    <section class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center gap-2">
-      <span class="text-sm font-semibold text-slate-700 mr-2">Filtrar vista:</span>
-      <button onclick="filterCategory('ALL')" class="cat-btn active px-3.5 py-1.5 rounded-lg text-xs font-medium transition bg-slate-900 text-white">
-        Todas las Categorías
-      </button>
-      <button onclick="filterCategory('ACCESORIOS')" class="cat-btn px-3.5 py-1.5 rounded-lg text-xs font-medium transition bg-slate-100 text-slate-700 hover:bg-slate-200">
-        Accesorios
-      </button>
-      <button onclick="filterCategory('REPUESTOS')" class="cat-btn px-3.5 py-1.5 rounded-lg text-xs font-medium transition bg-slate-100 text-slate-700 hover:bg-slate-200">
-        Repuestos
-      </button>
-      <button onclick="filterCategory('APPAREL')" class="cat-btn px-3.5 py-1.5 rounded-lg text-xs font-medium transition bg-slate-100 text-slate-700 hover:bg-slate-200">
-        Apparel
-      </button>
-      <button onclick="filterCategory('MANO DE OBRA')" class="cat-btn px-3.5 py-1.5 rounded-lg text-xs font-medium transition bg-slate-100 text-slate-700 hover:bg-slate-200">
-        Mano de Obra
-      </button>
-    </section>
-
-    <!-- Gráficos Principales en Canvas -->
+    <!-- Gráficos en Canvas -->
     <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- Gráfico de Barras: Facturación vs Ganancia -->
       <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm lg:col-span-2">
-        <div class="mb-4">
-          <h3 class="font-semibold text-slate-800 text-lg">Monto Facturado vs. Ganancia Total por Categoría</h3>
-          <p class="text-xs text-slate-400">Comparativa directa de ingresos y ganancia en dólares ($)</p>
-        </div>
+        <h3 class="font-semibold text-slate-800 text-lg">Facturación vs. Ganancia por Categoría</h3>
+        <p class="text-xs text-slate-400 mb-4">Montos actualizados en dólares ($)</p>
         <div class="relative h-80">
           <canvas id="categoryComparisonChart"></canvas>
         </div>
       </div>
 
-      <!-- Gráfico de Dona: Distribución de la Facturación -->
       <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
-        <div class="mb-4">
+        <div>
           <h3 class="font-semibold text-slate-800 text-lg">Participación en Ventas</h3>
-          <p class="text-xs text-slate-400">Distribución porcentual sobre el total facturado</p>
+          <p class="text-xs text-slate-400 mb-4">Porcentaje de ventas por categoría</p>
         </div>
         <div class="relative h-64 flex items-center justify-center">
           <canvas id="categoryDonutChart"></canvas>
         </div>
-        <div class="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-2 text-xs text-slate-600">
-          <div><span class="inline-block w-2.5 h-2.5 rounded-full bg-blue-600 mr-1"></span>Accesorios: <strong>37,3%</strong></div>
-          <div><span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-500 mr-1"></span>Repuestos: <strong>23,8%</strong></div>
-          <div><span class="inline-block w-2.5 h-2.5 rounded-full bg-indigo-500 mr-1"></span>Apparel: <strong>23,0%</strong></div>
-          <div><span class="inline-block w-2.5 h-2.5 rounded-full bg-purple-500 mr-1"></span>Mano de Obra: <strong>16,0%</strong></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Gráfico Mensual (Evolución de Enero a Abril) -->
-    <section class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-      <div class="mb-4">
-        <h3 class="font-semibold text-slate-800 text-lg">Tendencia Mensual de Ventas y Ganancia</h3>
-        <p class="text-xs text-slate-400">Comportamiento acumulado por mes (Mes 1 a Mes 4) con curva de margen (%)</p>
-      </div>
-      <div class="relative h-72">
-        <canvas id="monthlyTrendChart"></canvas>
+        <div id="donutLegend" class="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-2 text-xs text-slate-600"></div>
       </div>
     </section>
 
     <!-- Tabla Detallada por Categoría -->
     <section class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
       <div class="px-6 py-4 border-b border-slate-200 bg-slate-50/60">
-        <h3 class="font-semibold text-slate-800 text-base">Desglose Detallado por Línea</h3>
+        <h3 class="font-semibold text-slate-800 text-base">Desglose Consolidado por Línea</h3>
       </div>
       <div class="overflow-x-auto">
         <table class="w-full text-left text-sm">
           <thead class="bg-slate-100 text-slate-600 font-semibold text-xs uppercase tracking-wider">
             <tr>
               <th class="py-3 px-6">Categoría</th>
-              <th class="py-3 px-6 text-center">Cantidad / Horas</th>
+              <th class="py-3 px-6 text-center">Cantidad</th>
               <th class="py-3 px-6 text-right">Monto Facturado</th>
               <th class="py-3 px-6 text-right">Ganancia Total</th>
-              <th class="py-3 px-6 text-center">Margen de Rentabilidad</th>
+              <th class="py-3 px-6 text-center">Margen</th>
             </tr>
           </thead>
-          <tbody id="tableBody" class="divide-y divide-slate-200">
-            <!-- Rellenado dinámicamente con JS -->
-          </tbody>
+          <tbody id="tableBody" class="divide-y divide-slate-200"></tbody>
           <tfoot class="bg-slate-50 font-bold border-t-2 border-slate-300">
             <tr>
-              <td class="py-3.5 px-6 text-slate-900">TOTAL</td>
-              <td class="py-3.5 px-6 text-center text-slate-900" id="totalQty">683,1</td>
-              <td class="py-3.5 px-6 text-right text-slate-900" id="totalFact">$83.763,48</td>
-              <td class="py-3.5 px-6 text-right text-emerald-600" id="totalProfit">$24.923,45</td>
-              <td class="py-3.5 px-6 text-center text-indigo-700" id="totalMargin">29,75%</td>
+              <td class="py-3 px-6 text-slate-900">TOTAL</td>
+              <td class="py-3 px-6 text-center text-slate-900" id="totalQty">--</td>
+              <td class="py-3 px-6 text-right text-slate-900" id="totalFact">--</td>
+              <td class="py-3 px-6 text-right text-emerald-600" id="totalProfit">--</td>
+              <td class="py-3 px-6 text-center text-indigo-700" id="totalMargin">--</td>
             </tr>
           </tfoot>
         </table>
@@ -157,212 +115,146 @@
 
   </div>
 
-  <!-- Lógica Interactiva con Chart.js -->
   <script>
-    // Datos consolidados de la hoja
-    const rawData = [
+    // PEGA AQUÍ TU ENLACE CSV PUBLICADO DE GOOGLE SHEETS
+    // (Ejemplo: https://docs.google.com/spreadsheets/d/e/2PACX-.../pub?gid=0&single=true&output=csv)
+    const SHEET_CSV_URL = "PEGA_AQUI_TU_ENLACE_CSV";
+
+    // Datos de respaldo iniciales si aún no se ha publicado el CSV
+    const fallbackData = [
       { name: 'ACCESORIOS', qty: 44, facturado: 31234.54, ganancia: 4733.45, margen: 15.15, color: '#2563eb' },
       { name: 'REPUESTOS', qty: 376, facturado: 19896.93, ganancia: 8307.29, margen: 41.75, color: '#f59e0b' },
       { name: 'APPAREL', qty: 102, facturado: 19244.01, ganancia: 5409.51, margen: 28.11, color: '#6366f1' },
       { name: 'MANO DE OBRA', qty: 161.1, facturado: 13388.00, ganancia: 6473.20, margen: 48.35, color: '#a855f7' }
     ];
 
-    const monthsData = [
-      { mes: 'Enero (Mes 1)', qty: 39, facturado: 1774.20, ganancia: 864.74, margen: 48.74 },
-      { mes: 'Febrero (Mes 2)', qty: 45, facturado: 4624.40, ganancia: 2011.84, margen: 43.50 },
-      { mes: 'Marzo (Mes 3)', qty: 58, facturado: 9458.86, ganancia: 2734.23, margen: 28.91 },
-      { mes: 'Abril (Mes 4)', qty: 81, facturado: 6106.00, ganancia: 2574.46, margen: 42.16 }
-    ];
-
+    let barChart, donutChart;
     const formatCurrency = (val) => '$' + Number(val).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-    // Renderizar Tabla
-    function renderTable(items) {
-      const tbody = document.getElementById('tableBody');
-      tbody.innerHTML = '';
-      items.forEach(item => {
-        const tr = document.createElement('tr');
-        tr.className = 'hover:bg-slate-50 transition';
-        tr.innerHTML = `
-          <td class="py-4 px-6 font-medium text-slate-900 flex items-center gap-2">
-            <span class="w-3 h-3 rounded-full" style="background-color: ${item.color}"></span> ${item.name}
-          </td>
-          <td class="py-4 px-6 text-center text-slate-600">${item.qty.toLocaleString('es-ES')}</td>
-          <td class="py-4 px-6 text-right font-medium text-slate-900">${formatCurrency(item.facturado)}</td>
-          <td class="py-4 px-6 text-right font-semibold text-emerald-600">${formatCurrency(item.ganancia)}</td>
-          <td class="py-4 px-6 text-center">
-            <span class="px-2.5 py-1 text-xs rounded-full font-semibold ${item.margen >= 40 ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-700'}">
-              ${item.margen.toFixed(2)}%
-            </span>
-          </td>
-        `;
-        tbody.appendChild(tr);
+    function initCharts() {
+      const ctxBar = document.getElementById('categoryComparisonChart').getContext('2d');
+      barChart = new Chart(ctxBar, {
+        type: 'bar',
+        data: { labels: [], datasets: [
+          { label: 'Facturado ($)', data: [], backgroundColor: '#3b82f6', borderRadius: 6 },
+          { label: 'Ganancia ($)', data: [], backgroundColor: '#10b981', borderRadius: 6 }
+        ]},
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: { y: { beginAtZero: true, ticks: { callback: v => '$' + Number(v).toLocaleString('es-ES') } } }
+        }
+      });
+
+      const ctxDonut = document.getElementById('categoryDonutChart').getContext('2d');
+      donutChart = new Chart(ctxDonut, {
+        type: 'doughnut',
+        data: { labels: [], datasets: [{ data: [], backgroundColor: ['#2563eb', '#f59e0b', '#6366f1', '#a855f7', '#10b981'] }] },
+        options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { display: false } } }
       });
     }
 
-    renderTable(rawData);
-
-    // 1. Gráfico de Comparación de Categorías en Canvas
-    const ctxBar = document.getElementById('categoryComparisonChart').getContext('2d');
-    const barChart = new Chart(ctxBar, {
-      type: 'bar',
-      data: {
-        labels: rawData.map(d => d.name),
-        datasets: [
-          {
-            label: 'Monto Facturado ($)',
-            data: rawData.map(d => d.facturado),
-            backgroundColor: '#3b82f6',
-            borderRadius: 6
-          },
-          {
-            label: 'Ganancia Total ($)',
-            data: rawData.map(d => d.ganancia),
-            backgroundColor: '#10b981',
-            borderRadius: 6
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { position: 'top' },
-          tooltip: {
-            callbacks: {
-              label: (ctx) => `${ctx.dataset.label}: ${formatCurrency(ctx.parsed.y)}`
-            }
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { callback: v => '$' + Number(v).toLocaleString('es-ES') }
-          }
-        }
-      }
-    });
-
-    // 2. Gráfico de Dona
-    const ctxDonut = document.getElementById('categoryDonutChart').getContext('2d');
-    const donutChart = new Chart(ctxDonut, {
-      type: 'doughnut',
-      data: {
-        labels: rawData.map(d => d.name),
-        datasets: [{
-          data: rawData.map(d => d.facturado),
-          backgroundColor: rawData.map(d => d.color),
-          hoverOffset: 6
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: '65%',
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: function(ctx) {
-                const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
-                const pct = ((ctx.parsed / total) * 100).toFixed(1);
-                return `${ctx.label}: ${formatCurrency(ctx.parsed)} (${pct}%)`;
-              }
-            }
-          }
-        }
-      }
-    });
-
-    // 3. Gráfico de Tendencia Mensual
-    const ctxTrend = document.getElementById('monthlyTrendChart').getContext('2d');
-    new Chart(ctxTrend, {
-      type: 'bar',
-      data: {
-        labels: monthsData.map(d => d.mes),
-        datasets: [
-          {
-            type: 'line',
-            label: 'Margen (%)',
-            data: monthsData.map(d => d.margen),
-            borderColor: '#ef4444',
-            backgroundColor: '#ef4444',
-            borderWidth: 2,
-            pointRadius: 4,
-            yAxisID: 'y1'
-          },
-          {
-            type: 'bar',
-            label: 'Monto Facturado ($)',
-            data: monthsData.map(d => d.facturado),
-            backgroundColor: '#93c5fd',
-            borderRadius: 6,
-            yAxisID: 'y'
-          },
-          {
-            type: 'bar',
-            label: 'Ganancia ($)',
-            data: monthsData.map(d => d.ganancia),
-            backgroundColor: '#34d399',
-            borderRadius: 6,
-            yAxisID: 'y'
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: { mode: 'index', intersect: false },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { callback: v => '$' + Number(v).toLocaleString('es-ES') }
-          },
-          y1: {
-            position: 'right',
-            grid: { drawOnChartArea: false },
-            ticks: { callback: v => v + '%' }
-          }
-        }
-      }
-    });
-
-    // Función de filtrado interactivo por botones
-    function filterCategory(catName) {
-      document.querySelectorAll('.cat-btn').forEach(btn => {
-        btn.classList.remove('bg-slate-900', 'text-white');
-        btn.classList.add('bg-slate-100', 'text-slate-700');
+    function updateUI(data) {
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+      data.forEach((item, index) => {
+        const color = item.color || ['#2563eb', '#f59e0b', '#6366f1', '#a855f7'][index % 4];
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="py-4 px-6 font-medium text-slate-900 flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full" style="background-color: ${color}"></span> ${item.name}
+            </td>
+            <td class="py-4 px-6 text-center text-slate-600">${item.qty.toLocaleString('es-ES')}</td>
+            <td class="py-4 px-6 text-right font-medium text-slate-900">${formatCurrency(item.facturado)}</td>
+            <td class="py-4 px-6 text-right font-semibold text-emerald-600">${formatCurrency(item.ganancia)}</td>
+            <td class="py-4 px-6 text-center">
+              <span class="px-2.5 py-1 text-xs rounded-full font-semibold ${item.margen >= 40 ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-700'}">
+                ${item.margen.toFixed(2)}%
+              </span>
+            </td>
+          </tr>
+        `;
       });
-      event.target.classList.remove('bg-slate-100', 'text-slate-700');
-      event.target.classList.add('bg-slate-900', 'text-white');
 
-      let filtered = rawData;
-      if (catName !== 'ALL') {
-        filtered = rawData.filter(d => d.name === catName);
-      }
-
-      renderTable(filtered);
-
-      const totFact = filtered.reduce((a, b) => a + b.facturado, 0);
-      const totProf = filtered.reduce((a, b) => a + b.ganancia, 0);
-      const totQty = filtered.reduce((a, b) => a + b.qty, 0);
-      const avgMarg = (totProf / totFact) * 100;
+      const totFact = data.reduce((a, b) => a + b.facturado, 0);
+      const totProf = data.reduce((a, b) => a + b.ganancia, 0);
+      const totQty = data.reduce((a, b) => a + b.qty, 0);
+      const avgMargin = (totProf / totFact) * 100;
 
       document.getElementById('kpiFacturado').innerText = formatCurrency(totFact);
       document.getElementById('kpiGanancia').innerText = formatCurrency(totProf);
-      document.getElementById('kpiMargen').innerText = avgMarg.toFixed(2) + '%';
+      document.getElementById('kpiMargen').innerText = avgMargin.toFixed(2) + '%';
       document.getElementById('kpiCantidad').innerText = totQty.toLocaleString('es-ES');
 
       document.getElementById('totalFact').innerText = formatCurrency(totFact);
       document.getElementById('totalProfit').innerText = formatCurrency(totProf);
       document.getElementById('totalQty').innerText = totQty.toLocaleString('es-ES');
-      document.getElementById('totalMargin').innerText = avgMarg.toFixed(2) + '%';
+      document.getElementById('totalMargin').innerText = avgMargin.toFixed(2) + '%';
 
-      barChart.data.labels = filtered.map(d => d.name);
-      barChart.data.datasets[0].data = filtered.map(d => d.facturado);
-      barChart.data.datasets[1].data = filtered.map(d => d.ganancia);
+      barChart.data.labels = data.map(d => d.name);
+      barChart.data.datasets[0].data = data.map(d => d.facturado);
+      barChart.data.datasets[1].data = data.map(d => d.ganancia);
       barChart.update();
+
+      donutChart.data.labels = data.map(d => d.name);
+      donutChart.data.datasets[0].data = data.map(d => d.facturado);
+      donutChart.update();
     }
+
+    async function fetchSheetData() {
+      const status = document.getElementById('syncStatus');
+      if (!SHEET_CSV_URL || SHEET_CSV_URL.includes("PEGA_AQUI")) {
+        updateUI(fallbackData);
+        status.className = "inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800";
+        status.innerHTML = "● Usando datos consolidados";
+        return;
+      }
+
+      status.className = "inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800";
+      status.innerHTML = "● Sincronizando...";
+
+      Papa.parse(SHEET_CSV_URL, {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+          // Procesa dinámicamente las filas recibidas
+          const cleanNumber = (val) => Number(String(val || 0).replace(/[^0-9,-]+/g, "").replace(",", ".")) || 0;
+          const rows = results.data;
+          
+          // Agrupación automática por Categoria
+          const groups = {};
+          rows.forEach(r => {
+            const cat = (r['Categoria'] || r['CATEGORIA'] || r['Categoria '] || 'OTROS').trim();
+            if (!groups[cat]) groups[cat] = { name: cat, qty: 0, facturado: 0, ganancia: 0 };
+            groups[cat].qty += cleanNumber(r['Cant'] || r['Cantidad']);
+            groups[cat].facturado += cleanNumber(r['Monto Facturado'] || r['Monto']);
+            groups[cat].ganancia += cleanNumber(r['Ganancia']);
+          });
+
+          const parsedData = Object.values(groups).map(g => ({
+            ...g,
+            margen: g.facturado > 0 ? (g.ganancia / g.facturado) * 100 : 0
+          }));
+
+          updateUI(parsedData.length > 0 ? parsedData : fallbackData);
+          status.className = "inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800";
+          status.innerHTML = "● En vivo (Sincronizado)";
+        },
+        error: function(err) {
+          console.error(err);
+          updateUI(fallbackData);
+          status.className = "inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800";
+          status.innerHTML = "● Error al conectar CSV";
+        }
+      });
+    }
+
+    window.onload = () => {
+      initCharts();
+      fetchSheetData();
+      // Auto-actualiza cada 2 minutos sin recargar la página
+      setInterval(fetchSheetData, 120000);
+    };
   </script>
 </body>
 </html>

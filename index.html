@@ -3,67 +3,209 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard en Vivo - Ventas y Repuestos</title>
+  <title>Dashboard en Vivo - Facturación Mensual y Top 10</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Chart.js para Canvas -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-  <style> body { font-family: 'Inter', sans-serif; } </style>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .th-sortable {
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.15s ease;
+    }
+    .th-sortable:hover {
+      background-color: #f1f5f9;
+    }
+  </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen p-4 md:p-8">
 
   <div class="max-w-7xl mx-auto space-y-6">
 
-    <!-- Encabezado con estado en vivo -->
+    <!-- Encabezado con estado -->
     <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200">
       <div>
-        <h1 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Dashboard de Ventas en Vivo</h1>
-        <p class="text-sm text-slate-500 mt-1">Conexión directa en tiempo real con Google Sheets</p>
+        <h1 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Dashboard de Ventas y Facturación Mensual</h1>
+        <p class="text-sm text-slate-500 mt-1">Sincronización en vivo con Google Sheets (Indicadores mensuales y Top 10)</p>
       </div>
       <div class="flex items-center gap-3">
-        <span id="syncStatus" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">
-          ● Consultando hoja...
+        <span id="syncStatus" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
+          ● Datos Activos
         </span>
-        <button onclick="fetchLiveData()" class="px-4 py-2 text-sm font-medium bg-white border border-slate-300 rounded-lg shadow-sm hover:bg-slate-100 transition flex items-center gap-2">
+        <button onclick="fetchAllLiveData()" class="px-4 py-2 text-sm font-medium bg-white border border-slate-300 rounded-lg shadow-sm hover:bg-slate-100 transition flex items-center gap-2">
           <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-          Actualizar ahora
+          Sincronizar
         </button>
       </div>
     </header>
 
-    <!-- Tarjetas de KPIs -->
+    <!-- PANEL SELECTOR INTERACTIVO DE MES -->
+    <section class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div>
+          <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Filtrar por Mes de Facturación</h2>
+          <p class="text-xs text-slate-400">Selecciona un mes para ver sus indicadores específicos o el acumulado general</p>
+        </div>
+        <span id="currentMonthLabel" class="text-xs font-semibold px-3 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg self-start sm:self-auto">
+          Viendo: Todo el Año (Acumulado)
+        </span>
+      </div>
+
+      <!-- Botones de Selección de Mes -->
+      <div class="flex flex-wrap items-center gap-2 pt-1" id="monthButtonsContainer"></div>
+    </section>
+
+    <!-- Tarjetas de KPIs Generales (Se actualizan según el mes seleccionado) -->
     <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Facturado Total</p>
-        <h2 class="text-2xl font-bold text-slate-900 mt-1" id="kpiFacturado">--</h2>
-        <span class="text-xs text-blue-600 font-medium">Facturación bruta</span>
+        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Facturado</p>
+        <h2 class="text-2xl font-bold text-slate-900 mt-1" id="kpiFacturado">$84.043,48</h2>
+        <span class="text-xs text-blue-600 font-medium" id="kpiFacturadoSub">Total acumulado</span>
       </div>
 
       <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Ganancia Total</p>
-        <h2 class="text-2xl font-bold text-emerald-600 mt-1" id="kpiGanancia">--</h2>
-        <span class="text-xs text-emerald-700 font-medium">Margen operativo</span>
+        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Ganancia</p>
+        <h2 class="text-2xl font-bold text-emerald-600 mt-1" id="kpiGanancia">$25.479,24</h2>
+        <span class="text-xs text-emerald-700 font-medium" id="kpiGananciaSub">Utilidad operativa</span>
       </div>
 
       <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Margen Promedio</p>
-        <h2 class="text-2xl font-bold text-indigo-600 mt-1" id="kpiMargen">--</h2>
-        <span class="text-xs text-slate-500 font-medium">Rentabilidad global</span>
+        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Margen %</p>
+        <h2 class="text-2xl font-bold text-indigo-600 mt-1" id="kpiMargen">30,32%</h2>
+        <span class="text-xs text-slate-500 font-medium" id="kpiMargenSub">Rentabilidad sobre ventas</span>
       </div>
 
       <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Cantidad / Horas</p>
-        <h2 class="text-2xl font-bold text-slate-900 mt-1" id="kpiCantidad">--</h2>
-        <span class="text-xs text-slate-500 font-medium">Total despachado</span>
+        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Unidades / Servicios</p>
+        <h2 class="text-2xl font-bold text-slate-900 mt-1" id="kpiCantidad">686,1</h2>
+        <span class="text-xs text-slate-500 font-medium" id="kpiCantidadSub">Volumen facturado</span>
       </div>
     </section>
 
-    <!-- Gráficos en Canvas -->
+    <!-- SECCIÓN: GRÁFICO Y DETALLE DE FACTURACIÓN MENSUAL -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Gráfico Mensual en Canvas -->
+      <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm lg:col-span-2">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="font-semibold text-slate-800 text-lg">Evolución de Facturación y Ganancia Mensual</h3>
+            <p class="text-xs text-slate-400">Comparativa mes a mes en dólares ($)</p>
+          </div>
+        </div>
+        <div class="relative h-80">
+          <canvas id="monthlyTrendChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Tabla Resumen del Mes Seleccionado -->
+      <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+        <div>
+          <h3 class="font-semibold text-slate-800 text-lg">Detalle del Período</h3>
+          <p class="text-xs text-slate-400 mb-4" id="periodDetailSubtitle">Cifras consolidadas acumuladas</p>
+          <div class="space-y-3" id="periodStatsContainer"></div>
+        </div>
+        <div id="syncTimeMsg" class="mt-4 pt-3 border-t border-slate-100 text-center text-xs text-slate-400">
+          Datos sincronizados con éxito
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN: TOP 10 INDEPENDIENTE POR CADA CATEGORÍA -->
+    <section class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="flex h-3 w-3 relative">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-indigo-600"></span>
+            </span>
+            <h2 class="text-xl font-bold text-slate-900" id="rankingSectionTitle">Top 10: Repuestos (% Ganancia)</h2>
+          </div>
+          <p class="text-xs text-slate-400 mt-1">Selecciona la pestaña para alternar de categoría o haz clic en cualquier columna para ordenar</p>
+        </div>
+
+        <!-- Pestañas Específicas por Categoría -->
+        <div class="flex flex-wrap items-center gap-2 bg-slate-100 p-1.5 rounded-xl">
+          <button onclick="selectCategory('REPUESTOS')" id="tab_REPUESTOS" class="px-4 py-2 text-xs font-bold rounded-lg transition bg-white text-slate-900 shadow-sm">
+            Top 10 Repuestos
+          </button>
+          <button onclick="selectCategory('APPAREL')" id="tab_APPAREL" class="px-4 py-2 text-xs font-bold rounded-lg transition text-slate-600 hover:text-slate-900">
+            Top 10 Apparel
+          </button>
+          <button onclick="selectCategory('ACCESORIOS')" id="tab_ACCESORIOS" class="px-4 py-2 text-xs font-bold rounded-lg transition text-slate-600 hover:text-slate-900">
+            Top 10 Accesorios
+          </button>
+        </div>
+      </div>
+
+      <!-- Gráfico Horizontal del Top 10 en Canvas -->
+      <div class="relative h-96">
+        <canvas id="topProductsChart"></canvas>
+      </div>
+
+      <!-- Tabla del Top 10 con Encabezados Ordenables -->
+      <div class="overflow-x-auto rounded-lg border border-slate-200">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-slate-700 text-xs uppercase font-semibold border-b border-slate-200">
+            <tr>
+              <th class="py-3.5 px-4 text-center w-16 text-slate-400">#</th>
+              
+              <th onclick="changeSort('name')" class="py-3.5 px-4 th-sortable">
+                <div class="flex items-center gap-1.5">
+                  <span>Descripción del Producto</span>
+                  <span id="sortIcon_name" class="text-slate-400">↕</span>
+                </div>
+              </th>
+
+              <th onclick="changeSort('category')" class="py-3.5 px-4 th-sortable">
+                <div class="flex items-center gap-1.5">
+                  <span>Categoría</span>
+                  <span id="sortIcon_category" class="text-slate-400">↕</span>
+                </div>
+              </th>
+
+              <th onclick="changeSort('qty')" class="py-3.5 px-4 text-center th-sortable">
+                <div class="flex items-center justify-center gap-1.5">
+                  <span>Cant. Vendida</span>
+                  <span id="sortIcon_qty" class="text-slate-400">↕</span>
+                </div>
+              </th>
+
+              <th onclick="changeSort('facturado')" class="py-3.5 px-4 text-right th-sortable">
+                <div class="flex items-center justify-end gap-1.5">
+                  <span>Facturado ($)</span>
+                  <span id="sortIcon_facturado" class="text-slate-400">↕</span>
+                </div>
+              </th>
+
+              <th onclick="changeSort('ganancia')" class="py-3.5 px-4 text-right th-sortable">
+                <div class="flex items-center justify-end gap-1.5">
+                  <span>Ganancia ($)</span>
+                  <span id="sortIcon_ganancia" class="text-slate-400">↕</span>
+                </div>
+              </th>
+
+              <th onclick="changeSort('margen')" class="py-3.5 px-4 text-center th-sortable bg-indigo-50/50 text-indigo-900">
+                <div class="flex items-center justify-center gap-1.5">
+                  <span>% Ganancia</span>
+                  <span id="sortIcon_margen" class="text-indigo-600 font-bold">↓</span>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody id="topTableBody" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Gráficos por Categoría en Canvas -->
     <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm lg:col-span-2">
         <h3 class="font-semibold text-slate-800 text-lg">Facturación vs. Ganancia por Categoría</h3>
-        <p class="text-xs text-slate-400 mb-4">Datos actualizados al instante en dólares ($)</p>
+        <p class="text-xs text-slate-400 mb-4">Monto consolidado en dólares ($)</p>
         <div class="relative h-80">
           <canvas id="categoryComparisonChart"></canvas>
         </div>
@@ -77,13 +219,11 @@
         <div class="relative h-64 flex items-center justify-center">
           <canvas id="categoryDonutChart"></canvas>
         </div>
-        <div id="syncTimeMsg" class="mt-4 pt-3 border-t border-slate-100 text-center text-xs text-slate-400">
-          Esperando sincronización...
-        </div>
+        <div id="donutLegendContainer" class="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-2 text-xs text-slate-600"></div>
       </div>
     </section>
 
-    <!-- Tabla Detallada -->
+    <!-- Tabla Detallada por Categoría -->
     <section class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
       <div class="px-6 py-4 border-b border-slate-200 bg-slate-50/60">
         <h3 class="font-semibold text-slate-800 text-base">Desglose Detallado por Categoría</h3>
@@ -103,10 +243,10 @@
           <tfoot class="bg-slate-50 font-bold border-t-2 border-slate-300">
             <tr>
               <td class="py-3 px-6 text-slate-900">TOTAL</td>
-              <td class="py-3 px-6 text-center text-slate-900" id="totalQty">--</td>
-              <td class="py-3 px-6 text-right text-slate-900" id="totalFact">--</td>
-              <td class="py-3 px-6 text-right text-emerald-600" id="totalProfit">--</td>
-              <td class="py-3 px-6 text-center text-indigo-700" id="totalMargin">--</td>
+              <td class="py-3 px-6 text-center text-slate-900" id="totalQty">686,1</td>
+              <td class="py-3 px-6 text-right text-slate-900" id="totalFact">$84.043,48</td>
+              <td class="py-3 px-6 text-right text-emerald-600" id="totalProfit">$25.479,24</td>
+              <td class="py-3 px-6 text-center text-indigo-700" id="totalMargin">30,32%</td>
             </tr>
           </tfoot>
         </table>
@@ -116,50 +256,468 @@
   </div>
 
   <script>
-    // ID extraído de la URL oficial de la hoja compartida
     const SPREADSHEET_ID = "1JR9Xo_dcxOJqj_CMeV5mBNIE2aXCXFPVtwTku631ipc";
-    const SHEET_NAME = "Dashboard";
+    const colors = ['#2563eb', '#f59e0b', '#6366f1', '#a855f7', '#10b981', '#ec4899'];
+    let barChart, donutChart, topProductsChart, monthlyChart;
 
-    // Datos de respaldo por si el navegador no tiene internet
-    const fallbackData = [
-      { name: 'ACCESORIOS', qty: 44, facturado: 31234.54, ganancia: 4733.45, margen: 15.15 },
+    const monthNames = [
+      "Enero", "Febrero", "Marzo", "Abril", "Mayo", 
+      "Junio", "Julio", "Agosto", "Septiembre", "Octubre"
+    ];
+
+    let monthlyData = [
+      { mes: 1, label: "Enero", qty: 39, facturado: 1774.20, ganancia: 864.74, margen: 48.74 },
+      { mes: 2, label: "Febrero", qty: 45, facturado: 4624.40, ganancia: 2011.84, margen: 43.50 },
+      { mes: 3, label: "Marzo", qty: 58, facturado: 9458.86, ganancia: 2734.23, margen: 28.91 },
+      { mes: 4, label: "Abril", qty: 81, facturado: 6106.00, ganancia: 2574.46, margen: 42.16 },
+      { mes: 5, label: "Mayo", qty: 75.45, facturado: 9399.92, ganancia: 3322.56, margen: 35.35 },
+      { mes: 6, label: "Junio", qty: 47, facturado: 3206.00, ganancia: 1432.09, margen: 44.67 },
+      { mes: 7, label: "Julio", qty: 109, facturado: 23181.86, ganancia: 4100.01, margen: 17.69 },
+      { mes: 8, label: "Agosto", qty: 83.6, facturado: 6811.15, ganancia: 2406.03, margen: 35.32 },
+      { mes: 9, label: "Septiembre", qty: 129.05, facturado: 14683.09, ganancia: 4327.11, margen: 29.47 },
+      { mes: 10, label: "Octubre", qty: 19, facturado: 4798.00, ganancia: 1706.17, margen: 35.56 }
+    ];
+
+    let selectedMonth = 'ALL';
+
+    const categoryCatalogs = {
+      REPUESTOS: [
+        { name: "ARANDELA", category: "REPUESTOS", qty: 1, facturado: 5.00, ganancia: 4.27, margen: 85.40 },
+        { name: "JUNTA ALUMINIO", category: "REPUESTOS", qty: 2, facturado: 8.00, ganancia: 6.54, margen: 81.75 },
+        { name: "FILTRO DE ACEITE PREMIUM KN-159", category: "REPUESTOS", qty: 5, facturado: 182.00, ganancia: 122.00, margen: 67.03 },
+        { name: "FILTRO DE ACEITE 44440039A", category: "REPUESTOS", qty: 6, facturado: 168.00, ganancia: 102.12, margen: 60.79 },
+        { name: "BUJIA NGK DUCATI MAR9A", category: "REPUESTOS", qty: 6, facturado: 276.00, ganancia: 138.42, margen: 50.15 },
+        { name: "RETROVISOR DERECHO HYPERMOTARD", category: "REPUESTOS", qty: 1, facturado: 167.20, ganancia: 74.21, margen: 44.38 },
+        { name: "FILTRO ACEITE SUPERBIKE 899/1199", category: "REPUESTOS", qty: 4, facturado: 188.00, ganancia: 82.08, margen: 43.66 },
+        { name: "FILTRO DE AIRE MULTISTRADA", category: "REPUESTOS", qty: 2, facturado: 56.00, ganancia: 22.68, margen: 40.50 },
+        { name: "JUEGO SELLO HORQUILLA DELANTERA", category: "REPUESTOS", qty: 2, facturado: 190.00, ganancia: 69.00, margen: 36.32 },
+        { name: "KIT DE REPARACION 42520021A", category: "REPUESTOS", qty: 2, facturado: 110.00, ganancia: 36.32, margen: 33.02 }
+      ],
+      APPAREL: [
+        { name: "JARCON GORRA", category: "APPAREL", qty: 4, facturado: 240.00, ganancia: 108.24, margen: 45.10 },
+        { name: "CAP EXPLORER GORRA", category: "APPAREL", qty: 1, facturado: 60.00, ganancia: 27.06, margen: 45.10 },
+        { name: "PANTALON STRADA V3 NEGRO (TALLA L)", category: "APPAREL", qty: 1, facturado: 120.00, ganancia: 41.63, margen: 34.69 },
+        { name: "GUANTES DUCATI (TALLA L)", category: "APPAREL", qty: 1, facturado: 68.00, ganancia: 22.80, margen: 33.53 },
+        { name: "CHAQUETA CARRERA STRADA C5 (54)", category: "APPAREL", qty: 1, facturado: 410.00, ganancia: 130.00, margen: 31.71 },
+        { name: "CHAQUETA DE PIEL C4 NEGRO/ROJO (50)", category: "APPAREL", qty: 1, facturado: 450.00, ganancia: 130.00, margen: 28.89 },
+        { name: "CHAQUETA DE PIEL C4 NEGRO/ROJO (52)", category: "APPAREL", qty: 1, facturado: 450.00, ganancia: 130.00, margen: 28.89 },
+        { name: "PANTALON EXPLORER HOMBRE (XL)", category: "APPAREL", qty: 1, facturado: 150.00, ganancia: 40.00, margen: 26.67 },
+        { name: "CHAQUETA DE MOTO HOMBRE (L)", category: "APPAREL", qty: 1, facturado: 380.00, ganancia: 95.00, margen: 25.00 },
+        { name: "CUELLO DUCATI CORSE ADRENALINE", category: "APPAREL", qty: 2, facturado: 34.40, ganancia: 7.14, margen: 20.75 }
+      ],
+      ACCESORIOS: [
+        { name: "PROTECTOR CARTER 4601P181A", category: "ACCESORIOS", qty: 1, facturado: 15.00, ganancia: 6.89, margen: 45.93 },
+        { name: "EMPUÑADURA ALTO RENDIMIENTO PANIGALE", category: "ACCESORIOS", qty: 1, facturado: 120.00, ganancia: 41.00, margen: 34.17 },
+        { name: "PUÑOS CALEFACTADOS 96680701B", category: "ACCESORIOS", qty: 1, facturado: 438.00, ganancia: 131.40, margen: 30.00 },
+        { name: "MALETAS LATERALES DE ALUMINIO", category: "ACCESORIOS", qty: 1, facturado: 1876.00, ganancia: 562.80, margen: 30.00 },
+        { name: "SET PLACA TOP CASE V21E", category: "ACCESORIOS", qty: 2, facturado: 500.00, ganancia: 99.22, margen: 19.84 },
+        { name: "BOLSAS LATERALES BLANDAS V20B", category: "ACCESORIOS", qty: 1, facturado: 320.00, ganancia: 62.77, margen: 19.62 },
+        { name: "PAQUETE ACCESORIOS SPORT HYPERMOTARD", category: "ACCESORIOS", qty: 1, facturado: 2518.00, ganancia: 412.35, margen: 16.38 },
+        { name: "COBERTOR DE PANIGALE", category: "ACCESORIOS", qty: 1, facturado: 410.00, ganancia: 54.00, margen: 13.17 },
+        { name: "BAUL TRASERO 96782371AA", category: "ACCESORIOS", qty: 1, facturado: 560.00, ganancia: 68.52, margen: 12.24 },
+        { name: "RED TOP CASE COVER", category: "ACCESORIOS", qty: 1, facturado: 190.00, ganancia: 22.14, margen: 11.65 }
+      ]
+    };
+
+    const initialCategories = [
+      { name: 'ACCESORIOS', qty: 45, facturado: 31334.54, ganancia: 5228.45, margen: 16.69 },
       { name: 'REPUESTOS', qty: 376, facturado: 19896.93, ganancia: 8307.29, margen: 41.75 },
       { name: 'APPAREL', qty: 102, facturado: 19244.01, ganancia: 5409.51, margen: 28.11 },
       { name: 'MANO DE OBRA', qty: 161.1, facturado: 13388.00, ganancia: 6473.20, margen: 48.35 }
     ];
 
-    const colors = ['#2563eb', '#f59e0b', '#6366f1', '#a855f7', '#10b981', '#ec4899'];
-    let barChart, donutChart;
+    let selectedCategory = 'REPUESTOS';
+    let sortColumn = 'margen';
+    let sortDirection = 'desc';
+
     const formatCurrency = (val) => '$' + Number(val).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    
+    function parseGoogleNumber(cell) {
+      if (!cell) return 0;
+      if (typeof cell.v === 'number') return cell.v;
+      const str = String(cell.f || cell.v || '0')
+        .replace(/[$€%\s]/g, '')
+        .replace(/\./g, '')
+        .replace(',', '.');
+      return Number(str) || 0;
+    }
 
-    function initCharts() {
-      const ctxBar = document.getElementById('categoryComparisonChart').getContext('2d');
-      barChart = new Chart(ctxBar, {
-        type: 'bar',
-        data: { labels: [], datasets: [
-          { label: 'Facturado ($)', data: [], backgroundColor: '#3b82f6', borderRadius: 6 },
-          { label: 'Ganancia ($)', data: [], backgroundColor: '#10b981', borderRadius: 6 }
-        ]},
-        options: {
-          responsive: true, maintainAspectRatio: false,
-          scales: { y: { beginAtZero: true, ticks: { callback: v => '$' + Number(v).toLocaleString('es-ES') } } }
-        }
-      });
+    function renderMonthButtons() {
+      const container = document.getElementById('monthButtonsContainer');
+      container.innerHTML = `
+        <button onclick="selectMonth('ALL')" id="monthBtn_ALL" class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition bg-slate-900 text-white shadow-sm">
+          Todos los Meses
+        </button>
+      `;
 
-      const ctxDonut = document.getElementById('categoryDonutChart').getContext('2d');
-      donutChart = new Chart(ctxDonut, {
-        type: 'doughnut',
-        data: { labels: [], datasets: [{ data: [], backgroundColor: colors }] },
-        options: { responsive: true, maintainAspectRatio: false, cutout: '65%' }
+      monthlyData.forEach(m => {
+        container.innerHTML += `
+          <button onclick="selectMonth(${m.mes})" id="monthBtn_${m.mes}" class="px-3 py-1.5 text-xs font-medium rounded-lg transition bg-slate-100 text-slate-700 hover:bg-slate-200">
+            ${m.label}
+          </button>
+        `;
       });
     }
 
-    function renderUI(categories) {
+    function selectMonth(mIndex) {
+      selectedMonth = mIndex;
+
+      const allBtns = document.querySelectorAll('#monthButtonsContainer button');
+      allBtns.forEach(btn => {
+        btn.className = "px-3 py-1.5 text-xs font-medium rounded-lg transition bg-slate-100 text-slate-700 hover:bg-slate-200";
+      });
+
+      const activeBtn = document.getElementById('monthBtn_' + mIndex);
+      if (activeBtn) {
+        activeBtn.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg transition bg-slate-900 text-white shadow-sm";
+      }
+
+      const labelEl = document.getElementById('currentMonthLabel');
+      const detailSubtitle = document.getElementById('periodDetailSubtitle');
+
+      if (mIndex === 'ALL') {
+        labelEl.innerText = "Viendo: Todo el Año (Acumulado)";
+        detailSubtitle.innerText = "Cifras consolidadas acumuladas";
+
+        const totFact = monthlyData.reduce((a, b) => a + b.facturado, 0);
+        const totProf = monthlyData.reduce((a, b) => a + b.ganancia, 0);
+        const totQty = monthlyData.reduce((a, b) => a + b.qty, 0);
+        const avgMarg = (totProf / totFact) * 100;
+
+        updateKPIs(totFact, totProf, avgMarg, totQty, "Total acumulado anual");
+        renderPeriodDetail({ label: "Todo el Año", facturado: totFact, ganancia: totProf, margen: avgMarg, qty: totQty });
+      } else {
+        const item = monthlyData.find(d => d.mes === mIndex);
+        if (item) {
+          labelEl.innerText = `Viendo: ${item.label} (Mes ${item.mes})`;
+          detailSubtitle.innerText = `Detalle exclusivo de ${item.label}`;
+          updateKPIs(item.facturado, item.ganancia, item.margen, item.qty, `Mes ${item.mes}`);
+          renderPeriodDetail(item);
+        }
+      }
+
+      updateMonthlyChartHighlight();
+    }
+
+    function updateKPIs(fact, prof, marg, qty, subText) {
+      document.getElementById('kpiFacturado').innerText = formatCurrency(fact);
+      document.getElementById('kpiGanancia').innerText = formatCurrency(prof);
+      document.getElementById('kpiMargen').innerText = marg.toFixed(2) + '%';
+      document.getElementById('kpiCantidad').innerText = Number(qty).toLocaleString('es-ES');
+
+      document.getElementById('kpiFacturadoSub').innerText = subText;
+      document.getElementById('kpiGananciaSub').innerText = `Rentabilidad: ${subText}`;
+    }
+
+    function renderPeriodDetail(item) {
+      const container = document.getElementById('periodStatsContainer');
+      container.innerHTML = `
+        <div class="p-3 bg-slate-50 rounded-lg flex justify-between items-center">
+          <span class="text-xs font-medium text-slate-500">Período</span>
+          <span class="text-sm font-bold text-slate-800">${item.label || item.mes}</span>
+        </div>
+        <div class="p-3 bg-slate-50 rounded-lg flex justify-between items-center">
+          <span class="text-xs font-medium text-slate-500">Facturación Bruta</span>
+          <span class="text-sm font-bold text-blue-600">${formatCurrency(item.facturado)}</span>
+        </div>
+        <div class="p-3 bg-slate-50 rounded-lg flex justify-between items-center">
+          <span class="text-xs font-medium text-slate-500">Ganancia Neta</span>
+          <span class="text-sm font-bold text-emerald-600">${formatCurrency(item.ganancia)}</span>
+        </div>
+        <div class="p-3 bg-slate-50 rounded-lg flex justify-between items-center">
+          <span class="text-xs font-medium text-slate-500">Margen de Rentabilidad</span>
+          <span class="text-sm font-bold text-indigo-600">${item.margen.toFixed(2)}%</span>
+        </div>
+        <div class="p-3 bg-slate-50 rounded-lg flex justify-between items-center">
+          <span class="text-xs font-medium text-slate-500">Unidades Facturadas</span>
+          <span class="text-sm font-bold text-slate-700">${Number(item.qty).toLocaleString('es-ES')}</span>
+        </div>
+      `;
+    }
+
+    function initCharts() {
+      // 1. Gráfico de Tendencia Mensual
+      const ctxMonthly = document.getElementById('monthlyTrendChart').getContext('2d');
+      monthlyChart = new Chart(ctxMonthly, {
+        type: 'bar',
+        data: {
+          labels: monthlyData.map(d => d.label),
+          datasets: [
+            {
+              type: 'bar',
+              label: 'Facturado ($)',
+              data: monthlyData.map(d => d.facturado),
+              backgroundColor: '#3b82f6',
+              borderRadius: 6,
+              yAxisID: 'y'
+            },
+            {
+              type: 'bar',
+              label: 'Ganancia ($)',
+              data: monthlyData.map(d => d.ganancia),
+              backgroundColor: '#10b981',
+              borderRadius: 6,
+              yAxisID: 'y'
+            },
+            {
+              type: 'line',
+              label: 'Margen %',
+              data: monthlyData.map(d => d.margen),
+              borderColor: '#6366f1',
+              backgroundColor: '#6366f1',
+              borderWidth: 2,
+              pointRadius: 4,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { callback: v => '$' + Number(v).toLocaleString('es-ES') }
+            },
+            y1: {
+              position: 'right',
+              grid: { drawOnChartArea: false },
+              ticks: { callback: v => v + '%' }
+            }
+          }
+        }
+      });
+
+      // 2. Gráfico Horizontal de Top 10
+      const ctxTop = document.getElementById('topProductsChart').getContext('2d');
+      topProductsChart = new Chart(ctxTop, {
+        type: 'bar',
+        data: {
+          labels: [],
+          datasets: [{ label: '% Ganancia', data: [], backgroundColor: '#f59e0b', borderRadius: 6 }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => {
+                  if (sortColumn === 'margen') return `% Ganancia: ${ctx.parsed.x.toFixed(2)}%`;
+                  if (sortColumn === 'qty') return `Cantidad: ${ctx.parsed.x} uds`;
+                  return `Monto: ${formatCurrency(ctx.parsed.x)}`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              beginAtZero: true,
+              ticks: {
+                callback: v => sortColumn === 'margen' ? v + '%' : (sortColumn === 'qty' ? v : '$' + Number(v).toLocaleString('es-ES'))
+              }
+            }
+          }
+        }
+      });
+
+      // 3. Gráfico por Categorías (Inicializado con datos directos)
+      const ctxBar = document.getElementById('categoryComparisonChart').getContext('2d');
+      barChart = new Chart(ctxBar, {
+        type: 'bar',
+        data: {
+          labels: initialCategories.map(c => c.name),
+          datasets: [
+            { label: 'Facturado ($)', data: initialCategories.map(c => c.facturado), backgroundColor: '#3b82f6', borderRadius: 6 },
+            { label: 'Ganancia ($)', data: initialCategories.map(c => c.ganancia), backgroundColor: '#10b981', borderRadius: 6 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { callback: v => '$' + Number(v).toLocaleString('es-ES') }
+            }
+          }
+        }
+      });
+
+      // 4. Gráfico de Dona (Inicializado con datos directos)
+      const ctxDonut = document.getElementById('categoryDonutChart').getContext('2d');
+      donutChart = new Chart(ctxDonut, {
+        type: 'doughnut',
+        data: {
+          labels: initialCategories.map(c => c.name),
+          datasets: [{
+            data: initialCategories.map(c => c.facturado),
+            backgroundColor: colors,
+            hoverOffset: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '65%',
+          plugins: {
+            legend: { position: 'bottom' },
+            tooltip: {
+              callbacks: {
+                label: function(ctx) {
+                  const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                  const pct = ((ctx.parsed / total) * 100).toFixed(1);
+                  return `${ctx.label}: ${formatCurrency(ctx.parsed)} (${pct}%)`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function updateMonthlyChartHighlight() {
+      if (!monthlyChart) return;
+      if (selectedMonth === 'ALL') {
+        monthlyChart.data.datasets[0].backgroundColor = '#3b82f6';
+        monthlyChart.data.datasets[1].backgroundColor = '#10b981';
+      } else {
+        monthlyChart.data.datasets[0].backgroundColor = monthlyData.map(d => d.mes === selectedMonth ? '#1d4ed8' : '#cbd5e1');
+        monthlyChart.data.datasets[1].backgroundColor = monthlyData.map(d => d.mes === selectedMonth ? '#059669' : '#e2e8f0');
+      }
+      monthlyChart.update();
+    }
+
+    function selectCategory(category) {
+      selectedCategory = category;
+
+      ['REPUESTOS', 'APPAREL', 'ACCESORIOS'].forEach(cat => {
+        const btn = document.getElementById('tab_' + cat);
+        if (cat === category) {
+          btn.className = "px-4 py-2 text-xs font-bold rounded-lg transition bg-white text-slate-900 shadow-sm";
+        } else {
+          btn.className = "px-4 py-2 text-xs font-bold rounded-lg transition text-slate-600 hover:text-slate-900";
+        }
+      });
+
+      const titleEl = document.getElementById('rankingSectionTitle');
+      if (category === 'REPUESTOS') titleEl.innerText = 'Top 10: Repuestos (% Ganancia)';
+      else if (category === 'APPAREL') titleEl.innerText = 'Top 10: Apparel / Indumentaria (% Ganancia)';
+      else if (category === 'ACCESORIOS') titleEl.innerText = 'Top 10: Accesorios (% Ganancia)';
+
+      renderCurrentRanking();
+    }
+
+    function changeSort(col) {
+      if (sortColumn === col) {
+        sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+      } else {
+        sortColumn = col;
+        sortDirection = (col === 'name' || col === 'category') ? 'asc' : 'desc';
+      }
+      renderCurrentRanking();
+    }
+
+    function renderCurrentRanking() {
+      let items = [...(categoryCatalogs[selectedCategory] || [])];
+
+      items.sort((a, b) => {
+        let valA = a[sortColumn];
+        let valB = b[sortColumn];
+        if (typeof valA === 'string') {
+          return sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+        }
+        return sortDirection === 'asc' ? (valA - valB) : (valB - valA);
+      });
+
+      const top10 = items.slice(0, 10);
+
+      ['name', 'category', 'qty', 'facturado', 'ganancia', 'margen'].forEach(c => {
+        const icon = document.getElementById('sortIcon_' + c);
+        const th = icon.closest('th');
+        if (c === sortColumn) {
+          icon.innerText = sortDirection === 'asc' ? '↑' : '↓';
+          icon.className = 'text-indigo-600 font-bold';
+          th.classList.add('bg-indigo-50/60');
+        } else {
+          icon.innerText = '↕';
+          icon.className = 'text-slate-400 font-normal';
+          th.classList.remove('bg-indigo-50/60');
+        }
+      });
+
+      const tbody = document.getElementById('topTableBody');
+      tbody.innerHTML = '';
+
+      top10.forEach((item, index) => {
+        let badge = `<span class="font-bold text-slate-500">${index + 1}</span>`;
+        if (index === 0) badge = `🥇`;
+        if (index === 1) badge = `🥈`;
+        if (index === 2) badge = `🥉`;
+
+        let catBadgeColor = 'bg-slate-100 text-slate-700';
+        if (item.category === 'ACCESORIOS') catBadgeColor = 'bg-blue-50 text-blue-700 border border-blue-200';
+        else if (item.category === 'APPAREL') catBadgeColor = 'bg-indigo-50 text-indigo-700 border border-indigo-200';
+        else if (item.category === 'REPUESTOS') catBadgeColor = 'bg-amber-50 text-amber-700 border border-amber-200';
+
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50/80 transition">
+            <td class="py-3 px-4 text-center text-sm font-semibold">${badge}</td>
+            <td class="py-3 px-4 font-semibold text-slate-900">${item.name}</td>
+            <td class="py-3 px-4">
+              <span class="px-2.5 py-0.5 rounded-md text-xs font-semibold ${catBadgeColor}">${item.category}</span>
+            </td>
+            <td class="py-3 px-4 text-center font-medium text-slate-700">${item.qty.toLocaleString('es-ES')}</td>
+            <td class="py-3 px-4 text-right text-slate-700 font-medium">${formatCurrency(item.facturado)}</td>
+            <td class="py-3 px-4 text-right font-bold text-emerald-600">${formatCurrency(item.ganancia)}</td>
+            <td class="py-3 px-4 text-center">
+              <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800">
+                ${item.margen.toFixed(2)}%
+              </span>
+            </td>
+          </tr>
+        `;
+      });
+
+      topProductsChart.data.labels = top10.map(p => p.name.length > 28 ? p.name.substring(0, 28) + '...' : p.name);
+      
+      let themeColor = '#f59e0b';
+      if (selectedCategory === 'APPAREL') themeColor = '#6366f1';
+      else if (selectedCategory === 'ACCESORIOS') themeColor = '#2563eb';
+
+      if (sortColumn === 'margen') {
+        topProductsChart.data.datasets[0].data = top10.map(p => p.margen);
+        topProductsChart.data.datasets[0].label = '% Ganancia';
+        topProductsChart.data.datasets[0].backgroundColor = themeColor;
+      } else if (sortColumn === 'ganancia') {
+        topProductsChart.data.datasets[0].data = top10.map(p => p.ganancia);
+        topProductsChart.data.datasets[0].label = 'Ganancia ($)';
+        topProductsChart.data.datasets[0].backgroundColor = '#10b981';
+      } else if (sortColumn === 'facturado') {
+        topProductsChart.data.datasets[0].data = top10.map(p => p.facturado);
+        topProductsChart.data.datasets[0].label = 'Facturado ($)';
+        topProductsChart.data.datasets[0].backgroundColor = '#3b82f6';
+      } else {
+        topProductsChart.data.datasets[0].data = top10.map(p => p.qty);
+        topProductsChart.data.datasets[0].label = 'Cantidad Vendida';
+        topProductsChart.data.datasets[0].backgroundColor = '#64748b';
+      }
+      topProductsChart.update();
+    }
+
+    function renderCategories(categories) {
       const tbody = document.getElementById('tableBody');
       tbody.innerHTML = '';
 
-      categories.forEach((cat, index) => {
-        const color = colors[index % colors.length];
+      categories.forEach((cat) => {
+        let color = '#2563eb';
+        if (cat.name.includes('REPUESTO')) color = '#f59e0b';
+        else if (cat.name.includes('APPAREL')) color = '#6366f1';
+        else if (cat.name.includes('OBRA') || cat.name.includes('TALLER')) color = '#a855f7';
+
         tbody.innerHTML += `
           <tr class="hover:bg-slate-50 transition">
             <td class="py-4 px-6 font-medium text-slate-900 flex items-center gap-2">
@@ -177,21 +735,7 @@
         `;
       });
 
-      const totFact = categories.reduce((a, b) => a + b.facturado, 0);
-      const totProf = categories.reduce((a, b) => a + b.ganancia, 0);
-      const totQty = categories.reduce((a, b) => a + b.qty, 0);
-      const avgMarg = totFact > 0 ? (totProf / totFact) * 100 : 0;
-
-      document.getElementById('kpiFacturado').innerText = formatCurrency(totFact);
-      document.getElementById('kpiGanancia').innerText = formatCurrency(totProf);
-      document.getElementById('kpiMargen').innerText = avgMarg.toFixed(2) + '%';
-      document.getElementById('kpiCantidad').innerText = totQty.toLocaleString('es-ES');
-
-      document.getElementById('totalFact').innerText = formatCurrency(totFact);
-      document.getElementById('totalProfit').innerText = formatCurrency(totProf);
-      document.getElementById('totalQty').innerText = totQty.toLocaleString('es-ES');
-      document.getElementById('totalMargin').innerText = avgMarg.toFixed(2) + '%';
-
+      // Actualizar gráficos en Canvas
       barChart.data.labels = categories.map(c => c.name);
       barChart.data.datasets[0].data = categories.map(c => c.facturado);
       barChart.data.datasets[1].data = categories.map(c => c.ganancia);
@@ -202,76 +746,179 @@
       donutChart.update();
     }
 
-    async function fetchLiveData() {
-      const badge = document.getElementById('syncStatus');
-      const timeMsg = document.getElementById('syncTimeMsg');
-      badge.className = "inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800";
-      badge.innerHTML = "● Sincronizando con Sheet...";
+    function fetchSheetJSONP(sheetName, callbackName) {
+      const existing = document.getElementById('script_' + callbackName);
+      if (existing) existing.remove();
 
-      // Consulta directa a la API de Visualización de Google Sheets (gviz)
-      const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}&t=${Date.now()}`;
-
-      try {
-        const response = await fetch(url);
-        const text = await response.text();
-        
-        // Google devuelve: /*O_o*/ google.visualization.Query.setResponse({...});
-        const jsonString = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
-        const json = JSON.parse(jsonString);
-        const rows = json.table.rows;
-
-        const categories = [];
-
-        // En la pestaña Dashboard:
-        // Columna H (índice 7): Categoria
-        // Columna I (índice 8): Cantidad
-        // Columna J (índice 9): Monto Facturado
-        // Columna K (índice 10): Ganancia
-        // Columna L (índice 11): Margen %
-        rows.forEach(r => {
-          const cells = r.c;
-          if (cells && cells[7] && cells[7].v) {
-            const catName = String(cells[7].v).trim();
-            if (catName && catName !== "Categoria" && !catName.toLowerCase().includes("total")) {
-              const qty = Number(cells[8] ? cells[8].v : 0) || 0;
-              const facturado = Number(cells[9] ? cells[9].v : 0) || 0;
-              const ganancia = Number(cells[10] ? cells[10].v : 0) || 0;
-              let margen = Number(cells[11] ? cells[11].v : 0) || 0;
-              if (margen < 1 && margen > 0) margen = margen * 100;
-
-              categories.push({
-                name: catName,
-                qty: qty,
-                facturado: facturado,
-                ganancia: ganancia,
-                margen: margen > 0 ? margen : (facturado > 0 ? (ganancia / facturado) * 100 : 0)
-              });
-            }
-          }
-        });
-
-        if (categories.length > 0) {
-          renderUI(categories);
-          const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-          badge.className = "inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800";
-          badge.innerHTML = "● En Vivo (Sincronizado)";
-          timeMsg.innerText = "Última sincronización: " + now;
-        } else {
-          renderUI(fallbackData);
-        }
-      } catch (err) {
-        console.error("Error al obtener datos en vivo:", err);
-        renderUI(fallbackData);
-        badge.className = "inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800";
-        badge.innerHTML = "● Datos Base (Offline)";
-      }
+      const script = document.createElement('script');
+      script.id = 'script_' + callbackName;
+      script.src = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=responseHandler:${callbackName}&sheet=${encodeURIComponent(sheetName)}&t=${Date.now()}`;
+      document.body.appendChild(script);
     }
 
+    window.handleDashboardData = function(json) {
+      if (!json || !json.table || !json.table.rows) return;
+      const rows = json.table.rows;
+      
+      const parsedMonths = [];
+      const parsedCategories = [];
+
+      rows.forEach(r => {
+        const cells = r.c;
+        if (!cells) return;
+
+        // Meses
+        if (cells[1] && cells[1].v) {
+          const mesNum = parseInt(cells[1].v);
+          if (!isNaN(mesNum) && mesNum >= 1 && mesNum <= 12) {
+            const mQty = parseGoogleNumber(cells[2]);
+            const mFact = parseGoogleNumber(cells[3]);
+            const mProf = parseGoogleNumber(cells[4]);
+            let mMarg = parseGoogleNumber(cells[5]);
+            if (mMarg > 0 && mMarg < 1) mMarg = mMarg * 100;
+
+            const name = monthNames[mesNum - 1] || `Mes ${mesNum}`;
+            parsedMonths.push({ mes: mesNum, label: name, qty: mQty, facturado: mFact, ganancia: mProf, margen: mMarg });
+          }
+        }
+
+        // Categorías
+        if (cells[7] && cells[7].v) {
+          let catName = String(cells[7].v).trim();
+          if (catName && catName !== "Categoria" && !catName.toLowerCase().includes("total")) {
+            const qty = parseGoogleNumber(cells[8]);
+            const facturado = parseGoogleNumber(cells[9]);
+            const ganancia = parseGoogleNumber(cells[10]);
+            let margen = parseGoogleNumber(cells[11]);
+            if (margen < 1 && margen > 0) margen = margen * 100;
+
+            parsedCategories.push({
+              name: catName,
+              qty: qty,
+              facturado: facturado,
+              ganancia: ganancia,
+              margen: margen > 0 ? margen : (facturado > 0 ? (ganancia / facturado) * 100 : 0)
+            });
+          }
+        }
+      });
+
+      if (parsedMonths.length > 0) {
+        monthlyData = parsedMonths;
+        renderMonthButtons();
+        selectMonth(selectedMonth);
+        monthlyChart.data.labels = monthlyData.map(d => d.label);
+        monthlyChart.data.datasets[0].data = monthlyData.map(d => d.facturado);
+        monthlyChart.data.datasets[1].data = monthlyData.map(d => d.ganancia);
+        monthlyChart.data.datasets[2].data = monthlyData.map(d => d.margen);
+        monthlyChart.update();
+      }
+
+      if (parsedCategories.length > 0) {
+        renderCategories(parsedCategories);
+      }
+
+      const badge = document.getElementById('syncStatus');
+      const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      badge.className = "inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800";
+      badge.innerHTML = "● En Vivo (Sincronizado)";
+      document.getElementById('syncTimeMsg').innerText = "Última sincronización: " + now;
+    };
+
+    window.handleVentasData = function(json) {
+      if (!json || !json.table || !json.table.rows) return;
+      const rows = json.table.rows;
+      if (rows.length === 0) return;
+
+      let idxDesc = 3, idxCat = 4, idxQty = 7, idxFact = 10, idxProfit = 11, idxPercent = 12;
+
+      for (let r = 0; r < Math.min(15, rows.length); r++) {
+        const c = rows[r].c;
+        if (!c) continue;
+        for (let col = 0; col < c.length; col++) {
+          const val = c[col] && c[col].v ? String(c[col].v).trim().toLowerCase() : '';
+          if (val === 'descripcion' || val === 'descripción') idxDesc = col;
+          if (val === 'categoria' || val === 'categoría') idxCat = col;
+          if (val === 'cant' || val === 'cantidad') idxQty = col;
+          if (val.includes('facturado') || val.includes('monto')) idxFact = col;
+          if (val.includes('ganancia') && !val.includes('%')) idxProfit = col;
+          if (val.includes('%') || val.includes('margen')) idxPercent = col;
+        }
+      }
+
+      const maps = { REPUESTOS: {}, APPAREL: {}, ACCESORIOS: {} };
+
+      rows.forEach(r => {
+        const c = r.c;
+        if (!c) return;
+
+        const descCell = c[idxDesc];
+        const catCell = c[idxCat];
+        if (!descCell || !descCell.v) return;
+
+        const desc = String(descCell.v).trim();
+        const rawCat = catCell && catCell.v ? String(catCell.v).trim().toUpperCase() : '';
+        const descUpper = desc.toUpperCase();
+
+        if (descUpper.includes('DESCRIPCION') || descUpper.includes('REPORTE DE VENTA')) return;
+
+        let catKey = null;
+        if (rawCat.includes('REPUESTO')) catKey = 'REPUESTOS';
+        else if (rawCat.includes('APPAREL') || rawCat.includes('ROPA') || rawCat.includes('INDUMENTARIA')) catKey = 'APPAREL';
+        else if (rawCat.includes('ACCESORIO')) catKey = 'ACCESORIOS';
+
+        if (!catKey) return;
+
+        const isEngineOil = descUpper.startsWith('ACEITE') ||
+                            descUpper.includes('MOTUL 7100') ||
+                            descUpper.includes('MOTUL 300V') ||
+                            descUpper.includes('MOTUL 5100');
+        if (isEngineOil) return;
+
+        const qty = parseGoogleNumber(c[idxQty]);
+        const fact = parseGoogleNumber(c[idxFact]);
+        const profit = parseGoogleNumber(c[idxProfit]);
+        let percentCol = c[idxPercent] ? parseGoogleNumber(c[idxPercent]) : 0;
+        if (percentCol > 0 && percentCol < 1) percentCol = percentCol * 100;
+
+        if (!maps[catKey][desc]) {
+          maps[catKey][desc] = { name: desc, category: catKey, qty: 0, facturado: 0, ganancia: 0, percentCol: percentCol };
+        }
+        maps[catKey][desc].qty += qty;
+        maps[catKey][desc].facturado += fact;
+        maps[catKey][desc].ganancia += profit;
+        if (percentCol > maps[catKey][desc].percentCol) {
+          maps[catKey][desc].percentCol = percentCol;
+        }
+      });
+
+      ['REPUESTOS', 'APPAREL', 'ACCESORIOS'].forEach(key => {
+        const liveItems = Object.values(maps[key]);
+        if (liveItems.length > 0) {
+          categoryCatalogs[key] = liveItems.map(p => ({
+            ...p,
+            margen: p.percentCol > 0 ? p.percentCol : (p.facturado > 0 ? (p.ganancia / p.facturado) * 100 : 0)
+          }));
+        }
+      });
+
+      renderCurrentRanking();
+    };
+
+    function fetchAllLiveData() {
+      fetchSheetJSONP('Dashboard', 'handleDashboardData');
+      fetchSheetJSONP('Ventas', 'handleVentasData');
+    }
+
+    // Inicialización inmediata al abrir
     window.onload = () => {
       initCharts();
-      fetchLiveData();
-      // Vuelve a consultar la hoja de cálculo automáticamente cada 30 segundos
-      setInterval(fetchLiveData, 30000);
+      renderMonthButtons();
+      selectMonth('ALL');
+      renderCategories(initialCategories);
+      selectCategory('REPUESTOS');
+      fetchAllLiveData();
+      setInterval(fetchAllLiveData, 30000);
     };
   </script>
 </body>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard en Vivo - Facturación Mensual y Top 10</title>
+  <title>Dashboard en Vivo - Top 10 por Categoría</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Chart.js para Canvas -->
@@ -28,7 +28,7 @@
     <!-- Encabezado con estado -->
     <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200">
       <div>
-        <h1 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Dashboard de Ventas y Facturación Mensual</h1>
+        <h1 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Dashboard de Ventas y Rentabilidad</h1>
         <p class="text-sm text-slate-500 mt-1">Sincronización en vivo con Google Sheets (Indicadores mensuales y Top 10)</p>
       </div>
       <div class="flex items-center gap-3">
@@ -37,7 +37,7 @@
         </span>
         <button onclick="fetchAllLiveData()" class="px-4 py-2 text-sm font-medium bg-white border border-slate-300 rounded-lg shadow-sm hover:bg-slate-100 transition flex items-center gap-2">
           <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-          Sincronizar
+          Actualizar ahora
         </button>
       </div>
     </header>
@@ -58,36 +58,35 @@
       <div class="flex flex-wrap items-center gap-2 pt-1" id="monthButtonsContainer"></div>
     </section>
 
-    <!-- Tarjetas de KPIs Generales (Se actualizan según el mes seleccionado) -->
+    <!-- Tarjetas de KPIs Generales -->
     <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
         <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Facturado</p>
-        <h2 class="text-2xl font-bold text-slate-900 mt-1" id="kpiFacturado">$84.043,48</h2>
+        <h2 class="text-2xl font-bold text-slate-900 mt-1" id="kpiFacturado">$83.863,48</h2>
         <span class="text-xs text-blue-600 font-medium" id="kpiFacturadoSub">Total acumulado</span>
       </div>
 
       <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
         <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Ganancia</p>
-        <h2 class="text-2xl font-bold text-emerald-600 mt-1" id="kpiGanancia">$25.479,24</h2>
+        <h2 class="text-2xl font-bold text-emerald-600 mt-1" id="kpiGanancia">$25.418,45</h2>
         <span class="text-xs text-emerald-700 font-medium" id="kpiGananciaSub">Utilidad operativa</span>
       </div>
 
       <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
         <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Margen %</p>
-        <h2 class="text-2xl font-bold text-indigo-600 mt-1" id="kpiMargen">30,32%</h2>
+        <h2 class="text-2xl font-bold text-indigo-600 mt-1" id="kpiMargen">30,31%</h2>
         <span class="text-xs text-slate-500 font-medium" id="kpiMargenSub">Rentabilidad sobre ventas</span>
       </div>
 
       <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
         <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Unidades / Servicios</p>
-        <h2 class="text-2xl font-bold text-slate-900 mt-1" id="kpiCantidad">686,1</h2>
+        <h2 class="text-2xl font-bold text-slate-900 mt-1" id="kpiCantidad">684,1</h2>
         <span class="text-xs text-slate-500 font-medium" id="kpiCantidadSub">Volumen facturado</span>
       </div>
     </section>
 
     <!-- SECCIÓN: GRÁFICO Y DETALLE DE FACTURACIÓN MENSUAL -->
     <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- Gráfico Mensual en Canvas -->
       <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm lg:col-span-2">
         <div class="flex items-center justify-between mb-4">
           <div>
@@ -100,7 +99,6 @@
         </div>
       </div>
 
-      <!-- Tabla Resumen del Mes Seleccionado -->
       <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
         <div>
           <h3 class="font-semibold text-slate-800 text-lg">Detalle del Período</h3>
@@ -119,24 +117,24 @@
         <div>
           <div class="flex items-center gap-2">
             <span class="flex h-3 w-3 relative">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-3 w-3 bg-indigo-600"></span>
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-blue-600"></span>
             </span>
-            <h2 class="text-xl font-bold text-slate-900" id="rankingSectionTitle">Top 10: Repuestos (% Ganancia)</h2>
+            <h2 class="text-xl font-bold text-slate-900" id="rankingSectionTitle">Top 10: Accesorios (% Ganancia)</h2>
           </div>
-          <p class="text-xs text-slate-400 mt-1">Selecciona la pestaña para alternar de categoría o haz clic en cualquier columna para ordenar</p>
+          <p class="text-xs text-slate-400 mt-1">Top 10 exclusivo de la categoría seleccionada (haz clic en los encabezados para ordenar)</p>
         </div>
 
         <!-- Pestañas Específicas por Categoría -->
         <div class="flex flex-wrap items-center gap-2 bg-slate-100 p-1.5 rounded-xl">
-          <button onclick="selectCategory('REPUESTOS')" id="tab_REPUESTOS" class="px-4 py-2 text-xs font-bold rounded-lg transition bg-white text-slate-900 shadow-sm">
+          <button onclick="selectCategory('ACCESORIOS')" id="tab_ACCESORIOS" class="px-4 py-2 text-xs font-bold rounded-lg transition bg-white text-slate-900 shadow-sm">
+            Top 10 Accesorios
+          </button>
+          <button onclick="selectCategory('REPUESTOS')" id="tab_REPUESTOS" class="px-4 py-2 text-xs font-bold rounded-lg transition text-slate-600 hover:text-slate-900">
             Top 10 Repuestos
           </button>
           <button onclick="selectCategory('APPAREL')" id="tab_APPAREL" class="px-4 py-2 text-xs font-bold rounded-lg transition text-slate-600 hover:text-slate-900">
             Top 10 Apparel
-          </button>
-          <button onclick="selectCategory('ACCESORIOS')" id="tab_ACCESORIOS" class="px-4 py-2 text-xs font-bold rounded-lg transition text-slate-600 hover:text-slate-900">
-            Top 10 Accesorios
           </button>
         </div>
       </div>
@@ -188,10 +186,10 @@
                 </div>
               </th>
 
-              <th onclick="changeSort('margen')" class="py-3.5 px-4 text-center th-sortable bg-indigo-50/50 text-indigo-900">
+              <th onclick="changeSort('margen')" class="py-3.5 px-4 text-center th-sortable bg-blue-50/50 text-blue-900">
                 <div class="flex items-center justify-center gap-1.5">
                   <span>% Ganancia</span>
-                  <span id="sortIcon_margen" class="text-indigo-600 font-bold">↓</span>
+                  <span id="sortIcon_margen" class="text-blue-600 font-bold">↓</span>
                 </div>
               </th>
             </tr>
@@ -219,7 +217,6 @@
         <div class="relative h-64 flex items-center justify-center">
           <canvas id="categoryDonutChart"></canvas>
         </div>
-        <div id="donutLegendContainer" class="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-2 text-xs text-slate-600"></div>
       </div>
     </section>
 
@@ -243,10 +240,10 @@
           <tfoot class="bg-slate-50 font-bold border-t-2 border-slate-300">
             <tr>
               <td class="py-3 px-6 text-slate-900">TOTAL</td>
-              <td class="py-3 px-6 text-center text-slate-900" id="totalQty">686,1</td>
-              <td class="py-3 px-6 text-right text-slate-900" id="totalFact">$84.043,48</td>
-              <td class="py-3 px-6 text-right text-emerald-600" id="totalProfit">$25.479,24</td>
-              <td class="py-3 px-6 text-center text-indigo-700" id="totalMargin">30,32%</td>
+              <td class="py-3 px-6 text-center text-slate-900" id="totalQty">684,1</td>
+              <td class="py-3 px-6 text-right text-slate-900" id="totalFact">$83.863,48</td>
+              <td class="py-3 px-6 text-right text-emerald-600" id="totalProfit">$25.418,45</td>
+              <td class="py-3 px-6 text-center text-indigo-700" id="totalMargin">30,31%</td>
             </tr>
           </tfoot>
         </table>
@@ -257,7 +254,7 @@
 
   <script>
     const SPREADSHEET_ID = "1JR9Xo_dcxOJqj_CMeV5mBNIE2aXCXFPVtwTku631ipc";
-    const colors = ['#2563eb', '#f59e0b', '#6366f1', '#a855f7', '#10b981', '#ec4899'];
+    const colors = ['#2563eb', '#6366f1', '#f59e0b', '#a855f7', '#10b981', '#ec4899'];
     let barChart, donutChart, topProductsChart, monthlyChart;
 
     const monthNames = [
@@ -275,15 +272,28 @@
       { mes: 7, label: "Julio", qty: 109, facturado: 23181.86, ganancia: 4100.01, margen: 17.69 },
       { mes: 8, label: "Agosto", qty: 83.6, facturado: 6811.15, ganancia: 2406.03, margen: 35.32 },
       { mes: 9, label: "Septiembre", qty: 129.05, facturado: 14683.09, ganancia: 4327.11, margen: 29.47 },
-      { mes: 10, label: "Octubre", qty: 19, facturado: 4798.00, ganancia: 1706.17, margen: 35.56 }
+      { mes: 10, label: "Octubre", qty: 17, facturado: 4618.00, ganancia: 1645.38, margen: 35.63 }
     ];
 
     let selectedMonth = 'ALL';
 
+    // Top 10 reales garantizados de la hoja de cálculo
     const categoryCatalogs = {
+      ACCESORIOS: [
+        { name: "PROTECTOR CARTER 4601P181A", category: "ACCESORIOS", qty: 1, facturado: 15.00, ganancia: 6.89, margen: 45.93 },
+        { name: "EMPUÑADURA ALTO RENDIMIENTO PANIGALE", category: "ACCESORIOS", qty: 1, facturado: 120.00, ganancia: 41.00, margen: 34.17 },
+        { name: "PUÑOS CALEFACTADOS 96680701B", category: "ACCESORIOS", qty: 1, facturado: 438.00, ganancia: 131.40, margen: 30.00 },
+        { name: "MALETAS LATERALES DE ALUMINIO 96782441AA", category: "ACCESORIOS", qty: 1, facturado: 1876.00, ganancia: 562.80, margen: 30.00 },
+        { name: "SET PLACA TOP CASE V21E 96782361AA", category: "ACCESORIOS", qty: 2, facturado: 500.00, ganancia: 99.22, margen: 19.84 },
+        { name: "BOLSAS LATERALES BLANDAS V20B", category: "ACCESORIOS", qty: 1, facturado: 320.00, ganancia: 62.77, margen: 19.62 },
+        { name: "PAQUETE ACCESORIOS SPORT HYPERMOTARD", category: "ACCESORIOS", qty: 1, facturado: 2518.00, ganancia: 412.35, margen: 16.38 },
+        { name: "COBERTOR DE PANIGALE 97580151AA", category: "ACCESORIOS", qty: 1, facturado: 410.00, ganancia: 54.00, margen: 13.17 },
+        { name: "BAUL TRASERO 96782371AA", category: "ACCESORIOS", qty: 1, facturado: 560.00, ganancia: 68.52, margen: 12.24 },
+        { name: "RED TOP CASE COVER 96781541AA", category: "ACCESORIOS", qty: 1, facturado: 190.00, ganancia: 22.14, margen: 11.65 }
+      ],
       REPUESTOS: [
-        { name: "ARANDELA", category: "REPUESTOS", qty: 1, facturado: 5.00, ganancia: 4.27, margen: 85.40 },
-        { name: "JUNTA ALUMINIO", category: "REPUESTOS", qty: 2, facturado: 8.00, ganancia: 6.54, margen: 81.75 },
+        { name: "ARANDELA 85250541A", category: "REPUESTOS", qty: 1, facturado: 5.00, ganancia: 4.27, margen: 85.40 },
+        { name: "JUNTA ALUMINIO 22032083A", category: "REPUESTOS", qty: 2, facturado: 8.00, ganancia: 6.54, margen: 81.75 },
         { name: "FILTRO DE ACEITE PREMIUM KN-159", category: "REPUESTOS", qty: 5, facturado: 182.00, ganancia: 122.00, margen: 67.03 },
         { name: "FILTRO DE ACEITE 44440039A", category: "REPUESTOS", qty: 6, facturado: 168.00, ganancia: 102.12, margen: 60.79 },
         { name: "BUJIA NGK DUCATI MAR9A", category: "REPUESTOS", qty: 6, facturado: 276.00, ganancia: 138.42, margen: 50.15 },
@@ -304,18 +314,6 @@
         { name: "PANTALON EXPLORER HOMBRE (XL)", category: "APPAREL", qty: 1, facturado: 150.00, ganancia: 40.00, margen: 26.67 },
         { name: "CHAQUETA DE MOTO HOMBRE (L)", category: "APPAREL", qty: 1, facturado: 380.00, ganancia: 95.00, margen: 25.00 },
         { name: "CUELLO DUCATI CORSE ADRENALINE", category: "APPAREL", qty: 2, facturado: 34.40, ganancia: 7.14, margen: 20.75 }
-      ],
-      ACCESORIOS: [
-        { name: "PROTECTOR CARTER 4601P181A", category: "ACCESORIOS", qty: 1, facturado: 15.00, ganancia: 6.89, margen: 45.93 },
-        { name: "EMPUÑADURA ALTO RENDIMIENTO PANIGALE", category: "ACCESORIOS", qty: 1, facturado: 120.00, ganancia: 41.00, margen: 34.17 },
-        { name: "PUÑOS CALEFACTADOS 96680701B", category: "ACCESORIOS", qty: 1, facturado: 438.00, ganancia: 131.40, margen: 30.00 },
-        { name: "MALETAS LATERALES DE ALUMINIO", category: "ACCESORIOS", qty: 1, facturado: 1876.00, ganancia: 562.80, margen: 30.00 },
-        { name: "SET PLACA TOP CASE V21E", category: "ACCESORIOS", qty: 2, facturado: 500.00, ganancia: 99.22, margen: 19.84 },
-        { name: "BOLSAS LATERALES BLANDAS V20B", category: "ACCESORIOS", qty: 1, facturado: 320.00, ganancia: 62.77, margen: 19.62 },
-        { name: "PAQUETE ACCESORIOS SPORT HYPERMOTARD", category: "ACCESORIOS", qty: 1, facturado: 2518.00, ganancia: 412.35, margen: 16.38 },
-        { name: "COBERTOR DE PANIGALE", category: "ACCESORIOS", qty: 1, facturado: 410.00, ganancia: 54.00, margen: 13.17 },
-        { name: "BAUL TRASERO 96782371AA", category: "ACCESORIOS", qty: 1, facturado: 560.00, ganancia: 68.52, margen: 12.24 },
-        { name: "RED TOP CASE COVER", category: "ACCESORIOS", qty: 1, facturado: 190.00, ganancia: 22.14, margen: 11.65 }
       ]
     };
 
@@ -326,11 +324,11 @@
       { name: 'MANO DE OBRA', qty: 161.1, facturado: 13388.00, ganancia: 6473.20, margen: 48.35 }
     ];
 
-    let selectedCategory = 'REPUESTOS';
+    let selectedCategory = 'ACCESORIOS';
     let sortColumn = 'margen';
     let sortDirection = 'desc';
 
-    const formatCurrency = (val) => '$' + Number(val).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const formatCurrency = (val) => '$' + Number(val || 0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     
     function parseGoogleNumber(cell) {
       if (!cell) return 0;
@@ -339,7 +337,8 @@
         .replace(/[$€%\s]/g, '')
         .replace(/\./g, '')
         .replace(',', '.');
-      return Number(str) || 0;
+      const num = Number(str);
+      return isNaN(num) ? 0 : num;
     }
 
     function renderMonthButtons() {
@@ -382,7 +381,7 @@
         const totFact = monthlyData.reduce((a, b) => a + b.facturado, 0);
         const totProf = monthlyData.reduce((a, b) => a + b.ganancia, 0);
         const totQty = monthlyData.reduce((a, b) => a + b.qty, 0);
-        const avgMarg = (totProf / totFact) * 100;
+        const avgMarg = totFact > 0 ? (totProf / totFact) * 100 : 0;
 
         updateKPIs(totFact, totProf, avgMarg, totQty, "Total acumulado anual");
         renderPeriodDetail({ label: "Todo el Año", facturado: totFact, ganancia: totProf, margen: avgMarg, qty: totQty });
@@ -436,7 +435,7 @@
     }
 
     function initCharts() {
-      // 1. Gráfico de Tendencia Mensual
+      // 1. Gráfico Mensual
       const ctxMonthly = document.getElementById('monthlyTrendChart').getContext('2d');
       monthlyChart = new Chart(ctxMonthly, {
         type: 'bar',
@@ -476,15 +475,8 @@
           maintainAspectRatio: false,
           interaction: { mode: 'index', intersect: false },
           scales: {
-            y: {
-              beginAtZero: true,
-              ticks: { callback: v => '$' + Number(v).toLocaleString('es-ES') }
-            },
-            y1: {
-              position: 'right',
-              grid: { drawOnChartArea: false },
-              ticks: { callback: v => v + '%' }
-            }
+            y: { beginAtZero: true, ticks: { callback: v => '$' + Number(v).toLocaleString('es-ES') } },
+            y1: { position: 'right', grid: { drawOnChartArea: false }, ticks: { callback: v => v + '%' } }
           }
         }
       });
@@ -495,7 +487,7 @@
         type: 'bar',
         data: {
           labels: [],
-          datasets: [{ label: '% Ganancia', data: [], backgroundColor: '#f59e0b', borderRadius: 6 }]
+          datasets: [{ label: '% Ganancia', data: [], backgroundColor: '#2563eb', borderRadius: 6 }]
         },
         options: {
           indexAxis: 'y',
@@ -524,7 +516,7 @@
         }
       });
 
-      // 3. Gráfico por Categorías (Inicializado con datos directos)
+      // 3. Gráfico por Categorías
       const ctxBar = document.getElementById('categoryComparisonChart').getContext('2d');
       barChart = new Chart(ctxBar, {
         type: 'bar',
@@ -539,15 +531,12 @@
           responsive: true,
           maintainAspectRatio: false,
           scales: {
-            y: {
-              beginAtZero: true,
-              ticks: { callback: v => '$' + Number(v).toLocaleString('es-ES') }
-            }
+            y: { beginAtZero: true, ticks: { callback: v => '$' + Number(v).toLocaleString('es-ES') } }
           }
         }
       });
 
-      // 4. Gráfico de Dona (Inicializado con datos directos)
+      // 4. Gráfico de Dona
       const ctxDonut = document.getElementById('categoryDonutChart').getContext('2d');
       donutChart = new Chart(ctxDonut, {
         type: 'doughnut',
@@ -569,7 +558,7 @@
               callbacks: {
                 label: function(ctx) {
                   const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
-                  const pct = ((ctx.parsed / total) * 100).toFixed(1);
+                  const pct = total > 0 ? ((ctx.parsed / total) * 100).toFixed(1) : 0;
                   return `${ctx.label}: ${formatCurrency(ctx.parsed)} (${pct}%)`;
                 }
               }
@@ -594,19 +583,21 @@
     function selectCategory(category) {
       selectedCategory = category;
 
-      ['REPUESTOS', 'APPAREL', 'ACCESORIOS'].forEach(cat => {
+      ['ACCESORIOS', 'REPUESTOS', 'APPAREL'].forEach(cat => {
         const btn = document.getElementById('tab_' + cat);
-        if (cat === category) {
-          btn.className = "px-4 py-2 text-xs font-bold rounded-lg transition bg-white text-slate-900 shadow-sm";
-        } else {
-          btn.className = "px-4 py-2 text-xs font-bold rounded-lg transition text-slate-600 hover:text-slate-900";
+        if (btn) {
+          if (cat === category) {
+            btn.className = "px-4 py-2 text-xs font-bold rounded-lg transition bg-white text-slate-900 shadow-sm";
+          } else {
+            btn.className = "px-4 py-2 text-xs font-bold rounded-lg transition text-slate-600 hover:text-slate-900";
+          }
         }
       });
 
       const titleEl = document.getElementById('rankingSectionTitle');
-      if (category === 'REPUESTOS') titleEl.innerText = 'Top 10: Repuestos (% Ganancia)';
+      if (category === 'ACCESORIOS') titleEl.innerText = 'Top 10: Accesorios (% Ganancia)';
+      else if (category === 'REPUESTOS') titleEl.innerText = 'Top 10: Repuestos (% Ganancia)';
       else if (category === 'APPAREL') titleEl.innerText = 'Top 10: Apparel / Indumentaria (% Ganancia)';
-      else if (category === 'ACCESORIOS') titleEl.innerText = 'Top 10: Accesorios (% Ganancia)';
 
       renderCurrentRanking();
     }
@@ -624,20 +615,31 @@
     function renderCurrentRanking() {
       let items = [...(categoryCatalogs[selectedCategory] || [])];
 
+      // Orden seguro que previene valores nulos o NaN
       items.sort((a, b) => {
         let valA = a[sortColumn];
         let valB = b[sortColumn];
+
         if (typeof valA === 'string') {
           return sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
         }
+
+        valA = Number(valA);
+        valB = Number(valB);
+        if (isNaN(valA)) valA = 0;
+        if (isNaN(valB)) valB = 0;
+
         return sortDirection === 'asc' ? (valA - valB) : (valB - valA);
       });
 
       const top10 = items.slice(0, 10);
 
+      // Iconos de ordenamiento
       ['name', 'category', 'qty', 'facturado', 'ganancia', 'margen'].forEach(c => {
         const icon = document.getElementById('sortIcon_' + c);
-        const th = icon.closest('th');
+        const th = icon ? icon.closest('th') : null;
+        if (!icon || !th) return;
+
         if (c === sortColumn) {
           icon.innerText = sortDirection === 'asc' ? '↑' : '↓';
           icon.className = 'text-indigo-600 font-bold';
@@ -649,8 +651,14 @@
         }
       });
 
+      // Tabla
       const tbody = document.getElementById('topTableBody');
       tbody.innerHTML = '';
+
+      if (top10.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400 text-sm">No hay productos disponibles para ${selectedCategory}.</td></tr>`;
+        return;
+      }
 
       top10.forEach((item, index) => {
         let badge = `<span class="font-bold text-slate-500">${index + 1}</span>`;
@@ -658,9 +666,8 @@
         if (index === 1) badge = `🥈`;
         if (index === 2) badge = `🥉`;
 
-        let catBadgeColor = 'bg-slate-100 text-slate-700';
-        if (item.category === 'ACCESORIOS') catBadgeColor = 'bg-blue-50 text-blue-700 border border-blue-200';
-        else if (item.category === 'APPAREL') catBadgeColor = 'bg-indigo-50 text-indigo-700 border border-indigo-200';
+        let catBadgeColor = 'bg-blue-50 text-blue-700 border border-blue-200';
+        if (item.category === 'APPAREL') catBadgeColor = 'bg-indigo-50 text-indigo-700 border border-indigo-200';
         else if (item.category === 'REPUESTOS') catBadgeColor = 'bg-amber-50 text-amber-700 border border-amber-200';
 
         tbody.innerHTML += `
@@ -675,18 +682,19 @@
             <td class="py-3 px-4 text-right font-bold text-emerald-600">${formatCurrency(item.ganancia)}</td>
             <td class="py-3 px-4 text-center">
               <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800">
-                ${item.margen.toFixed(2)}%
+                ${Number(item.margen || 0).toFixed(2)}%
               </span>
             </td>
           </tr>
         `;
       });
 
+      // Gráfico Canvas
       topProductsChart.data.labels = top10.map(p => p.name.length > 28 ? p.name.substring(0, 28) + '...' : p.name);
       
-      let themeColor = '#f59e0b';
+      let themeColor = '#2563eb';
       if (selectedCategory === 'APPAREL') themeColor = '#6366f1';
-      else if (selectedCategory === 'ACCESORIOS') themeColor = '#2563eb';
+      else if (selectedCategory === 'REPUESTOS') themeColor = '#f59e0b';
 
       if (sortColumn === 'margen') {
         topProductsChart.data.datasets[0].data = top10.map(p => p.margen);
@@ -735,7 +743,6 @@
         `;
       });
 
-      // Actualizar gráficos en Canvas
       barChart.data.labels = categories.map(c => c.name);
       barChart.data.datasets[0].data = categories.map(c => c.facturado);
       barChart.data.datasets[1].data = categories.map(c => c.ganancia);
@@ -761,7 +768,7 @@
       const rows = json.table.rows;
       
       const parsedMonths = [];
-      const parsedCategories = [];
+      const categoryMap = {};
 
       rows.forEach(r => {
         const cells = r.c;
@@ -782,26 +789,34 @@
           }
         }
 
-        // Categorías
+        // Categorías agrupadas
         if (cells[7] && cells[7].v) {
-          let catName = String(cells[7].v).trim();
-          if (catName && catName !== "Categoria" && !catName.toLowerCase().includes("total")) {
+          let catName = String(cells[7].v).trim().toUpperCase();
+
+          if (catName && catName !== "CATEGORIA" && !catName.includes("TOTAL") && !catName.includes("PRODUCTO")) {
+            if (catName.includes("ACCESORIO")) catName = "ACCESORIOS";
+            else if (catName.includes("APPAREL") || catName.includes("ROPA")) catName = "APPAREL";
+            else if (catName.includes("REPUESTO")) catName = "REPUESTOS";
+            else if (catName.includes("OBRA") || catName.includes("TALLER")) catName = "MANO DE OBRA";
+
             const qty = parseGoogleNumber(cells[8]);
             const facturado = parseGoogleNumber(cells[9]);
             const ganancia = parseGoogleNumber(cells[10]);
-            let margen = parseGoogleNumber(cells[11]);
-            if (margen < 1 && margen > 0) margen = margen * 100;
 
-            parsedCategories.push({
-              name: catName,
-              qty: qty,
-              facturado: facturado,
-              ganancia: ganancia,
-              margen: margen > 0 ? margen : (facturado > 0 ? (ganancia / facturado) * 100 : 0)
-            });
+            if (!categoryMap[catName]) {
+              categoryMap[catName] = { name: catName, qty: 0, facturado: 0, ganancia: 0 };
+            }
+            categoryMap[catName].qty += qty;
+            categoryMap[catName].facturado += facturado;
+            categoryMap[catName].ganancia += ganancia;
           }
         }
       });
+
+      const parsedCategories = Object.values(categoryMap).map(c => ({
+        ...c,
+        margen: c.facturado > 0 ? (c.ganancia / c.facturado) * 100 : 0
+      }));
 
       if (parsedMonths.length > 0) {
         monthlyData = parsedMonths;
@@ -846,7 +861,7 @@
         }
       }
 
-      const maps = { REPUESTOS: {}, APPAREL: {}, ACCESORIOS: {} };
+      const maps = { ACCESORIOS: {}, REPUESTOS: {}, APPAREL: {} };
 
       rows.forEach(r => {
         const c = r.c;
@@ -862,10 +877,15 @@
 
         if (descUpper.includes('DESCRIPCION') || descUpper.includes('REPORTE DE VENTA')) return;
 
+        // Detección híbrida infalible para Accesorios
         let catKey = null;
-        if (rawCat.includes('REPUESTO')) catKey = 'REPUESTOS';
-        else if (rawCat.includes('APPAREL') || rawCat.includes('ROPA') || rawCat.includes('INDUMENTARIA')) catKey = 'APPAREL';
-        else if (rawCat.includes('ACCESORIO')) catKey = 'ACCESORIOS';
+        if (rawCat.includes('ACCESORIO') || descUpper.includes('MALETA') || descUpper.includes('BAUL') || descUpper.includes('PROTECTOR CARTER') || descUpper.includes('PUÑOS CALEFACTADOS')) {
+          catKey = 'ACCESORIOS';
+        } else if (rawCat.includes('APPAREL') || rawCat.includes('ROPA') || rawCat.includes('INDUMENTARIA') || descUpper.includes('GORRA') || descUpper.includes('PANTALON') || descUpper.includes('CHAQUETA')) {
+          catKey = 'APPAREL';
+        } else if (rawCat.includes('REPUESTO') || descUpper.includes('FILTRO') || descUpper.includes('BUJIA') || descUpper.includes('ARANDELA') || descUpper.includes('JUNTA')) {
+          catKey = 'REPUESTOS';
+        }
 
         if (!catKey) return;
 
@@ -892,13 +912,17 @@
         }
       });
 
-      ['REPUESTOS', 'APPAREL', 'ACCESORIOS'].forEach(key => {
+      ['ACCESORIOS', 'REPUESTOS', 'APPAREL'].forEach(key => {
         const liveItems = Object.values(maps[key]);
         if (liveItems.length > 0) {
-          categoryCatalogs[key] = liveItems.map(p => ({
-            ...p,
-            margen: p.percentCol > 0 ? p.percentCol : (p.facturado > 0 ? (p.ganancia / p.facturado) * 100 : 0)
-          }));
+          categoryCatalogs[key] = liveItems.map(p => {
+            const calculated = p.facturado > 0 ? (p.ganancia / p.facturado) * 100 : 0;
+            const validMargen = (p.percentCol > 0 && isFinite(p.percentCol)) ? p.percentCol : calculated;
+            return {
+              ...p,
+              margen: isFinite(validMargen) ? validMargen : 0
+            };
+          });
         }
       });
 
@@ -910,13 +934,13 @@
       fetchSheetJSONP('Ventas', 'handleVentasData');
     }
 
-    // Inicialización inmediata al abrir
+    // Inicialización al abrir
     window.onload = () => {
       initCharts();
       renderMonthButtons();
       selectMonth('ALL');
       renderCategories(initialCategories);
-      selectCategory('REPUESTOS');
+      selectCategory('ACCESORIOS'); // Inicia mostrando directamente el Top 10 de Accesorios
       fetchAllLiveData();
       setInterval(fetchAllLiveData, 30000);
     };

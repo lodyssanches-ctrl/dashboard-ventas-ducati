@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard en Vivo - Facturación y Top 10</title>
+  <title>Dashboard en Vivo - Ventas, Taller y Top 10</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Chart.js para Canvas -->
@@ -20,19 +20,10 @@
       background-color: #f1f5f9;
     }
 
-    /* Reglas para imprimir o guardar en PDF */
     @media print {
-      body {
-        background-color: #ffffff !important;
-        padding: 0 !important;
-      }
-      .no-print, header button, #monthButtonsContainer, #syncStatus {
-        display: none !important;
-      }
-      .max-w-7xl {
-        max-width: 100% !important;
-        margin: 0 !important;
-      }
+      body { background-color: #ffffff !important; padding: 0 !important; }
+      .no-print, header button, #monthButtonsContainer, #syncStatus { display: none !important; }
+      .max-w-7xl { max-width: 100% !important; margin: 0 !important; }
       section {
         box-shadow: none !important;
         border: 1px solid #cbd5e1 !important;
@@ -46,11 +37,11 @@
 
   <div class="max-w-7xl mx-auto space-y-6">
 
-    <!-- Encabezado con estado y botón de Exportar / Imprimir -->
+    <!-- Encabezado con estado y botón de Imprimir / Exportar -->
     <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200">
       <div>
-        <h1 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Dashboard de Ventas y Rentabilidad</h1>
-        <p class="text-sm text-slate-500 mt-1">Sincronización en vivo con Google Sheets (Indicadores mensuales y Top 10)</p>
+        <h1 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Dashboard de Ventas, Ganancia y Taller</h1>
+        <p class="text-sm text-slate-500 mt-1">Sincronización en vivo con Google Sheets (Accesorios, Repuestos, Apparel y Servicio Técnico)</p>
       </div>
       <div class="flex items-center gap-2">
         <span id="syncStatus" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
@@ -78,29 +69,21 @@
           Viendo: Todo el Año (Acumulado)
         </span>
       </div>
-
-      <!-- Botones de Selección de Mes -->
       <div class="flex flex-wrap items-center gap-2 pt-1 no-print" id="monthButtonsContainer"></div>
     </section>
 
-    <!-- Tarjetas de KPIs Generales -->
-    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- Tarjetas de KPIs Generales (Sin % de ganancia) -->
+    <section class="grid grid-cols-1 sm:grid-cols-3 gap-4">
       <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Facturado</p>
+        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Facturado Total</p>
         <h2 class="text-2xl font-bold text-slate-900 mt-1" id="kpiFacturado">$83.863,48</h2>
         <span class="text-xs text-blue-600 font-medium" id="kpiFacturadoSub">Total acumulado</span>
       </div>
 
       <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Ganancia</p>
+        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Ganancia Total</p>
         <h2 class="text-2xl font-bold text-emerald-600 mt-1" id="kpiGanancia">$25.418,45</h2>
-        <span class="text-xs text-emerald-700 font-medium" id="kpiGananciaSub">Utilidad operativa</span>
-      </div>
-
-      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Margen %</p>
-        <h2 class="text-2xl font-bold text-indigo-600 mt-1" id="kpiMargen">30,31%</h2>
-        <span class="text-xs text-slate-500 font-medium" id="kpiMargenSub">Rentabilidad sobre ventas</span>
+        <span class="text-xs text-emerald-700 font-medium" id="kpiGananciaSub">Utilidad operativa en dólares</span>
       </div>
 
       <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
@@ -136,7 +119,100 @@
       </div>
     </section>
 
-    <!-- SECCIÓN: TOP 10 INDEPENDIENTE POR CADA CATEGORÍA -->
+    <!-- APARTADO EXCLUSIVO: INFORMACIÓN DEL TALLER -->
+    <section class="bg-white p-6 rounded-xl border border-purple-200 shadow-sm space-y-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-purple-100 pb-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="p-1.5 bg-purple-100 rounded-lg text-purple-700">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            </span>
+            <h2 class="text-xl font-bold text-slate-900">Módulo de Taller y Mano de Obra</h2>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">Facturación, utilidad en dólares y horas técnicas de servicio</p>
+        </div>
+      </div>
+
+      <!-- KPIs Específicos del Taller (Sin %) -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-purple-50/50 p-4 rounded-xl border border-purple-100">
+          <p class="text-xs font-semibold text-purple-600 uppercase tracking-wider">Facturado en Taller</p>
+          <h3 class="text-2xl font-bold text-purple-950 mt-1">$13.388,00</h3>
+          <span class="text-xs text-purple-600 font-medium">Servicios y diagnósticos</span>
+        </div>
+        <div class="bg-emerald-50/50 p-4 rounded-xl border border-emerald-100">
+          <p class="text-xs font-semibold text-emerald-600 uppercase tracking-wider">Ganancia de Taller</p>
+          <h3 class="text-2xl font-bold text-emerald-700 mt-1">$6.473,20</h3>
+          <span class="text-xs text-emerald-600 font-medium">Utilidad neta</span>
+        </div>
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Horas / Unidades</p>
+          <h3 class="text-2xl font-bold text-slate-900 mt-1">161,1 hrs</h3>
+          <span class="text-xs text-slate-500 font-medium">Mano de obra aplicada</span>
+        </div>
+      </div>
+
+      <!-- Tabla y Gráfico de Taller -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2">
+        <div class="lg:col-span-2 overflow-x-auto rounded-lg border border-purple-100">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-purple-50/70 text-purple-900 text-xs uppercase font-semibold border-b border-purple-100">
+              <tr>
+                <th class="py-3 px-4">Concepto / Servicio Técnico</th>
+                <th class="py-3 px-4 text-center">Horas / Cant</th>
+                <th class="py-3 px-4 text-right">Facturado ($)</th>
+                <th class="py-3 px-4 text-right">Ganancia ($)</th>
+              </tr>
+            </thead>
+            <tbody id="tallerTableBody" class="divide-y divide-purple-50">
+              <tr class="hover:bg-purple-50/40 transition">
+                <td class="py-3.5 px-4 font-semibold text-slate-900">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-purple-600"></span>
+                    MANO DE OBRA GENERAL
+                  </div>
+                </td>
+                <td class="py-3.5 px-4 text-center text-slate-700">136,1 hrs</td>
+                <td class="py-3.5 px-4 text-right font-medium text-slate-900">$10.888,00</td>
+                <td class="py-3.5 px-4 text-right font-bold text-emerald-600">$3.973,20</td>
+              </tr>
+              <tr class="hover:bg-purple-50/40 transition">
+                <td class="py-3.5 px-4 font-semibold text-slate-900">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span>
+                    DUCATI DIAGNOSTIC SYSTEM (DDS)
+                  </div>
+                </td>
+                <td class="py-3.5 px-4 text-center text-slate-700">25,0 serv</td>
+                <td class="py-3.5 px-4 text-right font-medium text-slate-900">$2.500,00</td>
+                <td class="py-3.5 px-4 text-right font-bold text-emerald-600">$2.500,00</td>
+              </tr>
+            </tbody>
+            <tfoot class="bg-purple-50/80 font-bold border-t border-purple-200">
+              <tr>
+                <td class="py-3 px-4 text-purple-950">TOTAL TALLER</td>
+                <td class="py-3 px-4 text-center text-purple-950">161,1</td>
+                <td class="py-3 px-4 text-right text-purple-950">$13.388,00</td>
+                <td class="py-3 px-4 text-right text-emerald-700">$6.473,20</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="bg-white p-4 rounded-lg border border-purple-100 flex flex-col justify-between items-center">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-purple-900 text-center mb-2">Composición Facturación Taller</h4>
+          <div class="relative h-48 w-full flex items-center justify-center">
+            <canvas id="tallerChart"></canvas>
+          </div>
+          <div class="text-xs text-slate-500 text-center mt-2 flex justify-around w-full">
+            <span><strong>M.O:</strong> $10.888,00</span>
+            <span><strong>DDS:</strong> $2.500,00</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN: TOP 10 INDEPENDIENTE POR CADA CATEGORÍA (Ordenado por mayor Ganancia $) -->
     <section class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
         <div>
@@ -145,9 +221,9 @@
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
               <span class="relative inline-flex rounded-full h-3 w-3 bg-blue-600"></span>
             </span>
-            <h2 class="text-xl font-bold text-slate-900" id="rankingSectionTitle">Top 10: Accesorios (% Ganancia)</h2>
+            <h2 class="text-xl font-bold text-slate-900" id="rankingSectionTitle">Top 10: Accesorios con Mayor Ganancia ($)</h2>
           </div>
-          <p class="text-xs text-slate-400 mt-1">Top 10 exclusivo de la categoría seleccionada (haz clic en los encabezados para ordenar)</p>
+          <p class="text-xs text-slate-400 mt-1">Ranking de artículos ordenados por utilidad neta generada en dólares ($)</p>
         </div>
 
         <!-- Pestañas Específicas por Categoría -->
@@ -169,7 +245,7 @@
         <canvas id="topProductsChart"></canvas>
       </div>
 
-      <!-- Tabla del Top 10 con Encabezados Ordenables -->
+      <!-- Tabla del Top 10 con Encabezados Ordenables (Sin % de ganancia) -->
       <div class="overflow-x-auto rounded-lg border border-slate-200">
         <table class="w-full text-left text-sm">
           <thead class="bg-slate-50 text-slate-700 text-xs uppercase font-semibold border-b border-slate-200">
@@ -204,17 +280,10 @@
                 </div>
               </th>
 
-              <th onclick="changeSort('ganancia')" class="py-3.5 px-4 text-right th-sortable">
+              <th onclick="changeSort('ganancia')" class="py-3.5 px-4 text-right th-sortable bg-blue-50/50 text-blue-900">
                 <div class="flex items-center justify-end gap-1.5">
                   <span>Ganancia ($)</span>
-                  <span id="sortIcon_ganancia" class="text-slate-400">↕</span>
-                </div>
-              </th>
-
-              <th onclick="changeSort('margen')" class="py-3.5 px-4 text-center th-sortable bg-blue-50/50 text-blue-900">
-                <div class="flex items-center justify-center gap-1.5">
-                  <span>% Ganancia</span>
-                  <span id="sortIcon_margen" class="text-blue-600 font-bold">↓</span>
+                  <span id="sortIcon_ganancia" class="text-blue-600 font-bold">↓</span>
                 </div>
               </th>
             </tr>
@@ -237,7 +306,7 @@
       <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
         <div>
           <h3 class="font-semibold text-slate-800 text-lg">Participación en Ventas</h3>
-          <p class="text-xs text-slate-400 mb-4">% Facturado por categoría</p>
+          <p class="text-xs text-slate-400 mb-4">Distribución facturada por categoría</p>
         </div>
         <div class="relative h-64 flex items-center justify-center">
           <canvas id="categoryDonutChart"></canvas>
@@ -245,7 +314,7 @@
       </div>
     </section>
 
-    <!-- Tabla Detallada por Categoría -->
+    <!-- Tabla Detallada por Categoría (Sin % de ganancia) -->
     <section class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
       <div class="px-6 py-4 border-b border-slate-200 bg-slate-50/60">
         <h3 class="font-semibold text-slate-800 text-base">Desglose Detallado por Categoría</h3>
@@ -258,7 +327,6 @@
               <th class="py-3 px-6 text-center">Cantidad / Horas</th>
               <th class="py-3 px-6 text-right">Monto Facturado</th>
               <th class="py-3 px-6 text-right">Ganancia Total</th>
-              <th class="py-3 px-6 text-center">Margen</th>
             </tr>
           </thead>
           <tbody id="tableBody" class="divide-y divide-slate-200"></tbody>
@@ -268,7 +336,6 @@
               <td class="py-3 px-6 text-center text-slate-900" id="totalQty">684,1</td>
               <td class="py-3 px-6 text-right text-slate-900" id="totalFact">$83.863,48</td>
               <td class="py-3 px-6 text-right text-emerald-600" id="totalProfit">$25.418,45</td>
-              <td class="py-3 px-6 text-center text-indigo-700" id="totalMargin">30,31%</td>
             </tr>
           </tfoot>
         </table>
@@ -280,7 +347,7 @@
   <script>
     const SPREADSHEET_ID = "1JR9Xo_dcxOJqj_CMeV5mBNIE2aXCXFPVtwTku631ipc";
     const colors = ['#2563eb', '#6366f1', '#f59e0b', '#a855f7', '#10b981', '#ec4899'];
-    let barChart, donutChart, topProductsChart, monthlyChart;
+    let barChart, donutChart, topProductsChart, monthlyChart, tallerChart;
 
     const monthNames = [
       "Enero", "Febrero", "Marzo", "Abril", "Mayo", 
@@ -288,68 +355,69 @@
     ];
 
     let monthlyData = [
-      { mes: 1, label: "Enero", qty: 39, facturado: 1774.20, ganancia: 864.74, margen: 48.74 },
-      { mes: 2, label: "Febrero", qty: 45, facturado: 4624.40, ganancia: 2011.84, margen: 43.50 },
-      { mes: 3, label: "Marzo", qty: 58, facturado: 9458.86, ganancia: 2734.23, margen: 28.91 },
-      { mes: 4, label: "Abril", qty: 81, facturado: 6106.00, ganancia: 2574.46, margen: 42.16 },
-      { mes: 5, label: "Mayo", qty: 75.45, facturado: 9399.92, ganancia: 3322.56, margen: 35.35 },
-      { mes: 6, label: "Junio", qty: 47, facturado: 3206.00, ganancia: 1432.09, margen: 44.67 },
-      { mes: 7, label: "Julio", qty: 109, facturado: 23181.86, ganancia: 4100.01, margen: 17.69 },
-      { mes: 8, label: "Agosto", qty: 83.6, facturado: 6811.15, ganancia: 2406.03, margen: 35.32 },
-      { mes: 9, label: "Septiembre", qty: 129.05, facturado: 14683.09, ganancia: 4327.11, margen: 29.47 },
-      { mes: 10, label: "Octubre", qty: 17, facturado: 4618.00, ganancia: 1645.38, margen: 35.63 }
+      { mes: 1, label: "Enero", qty: 39, facturado: 1774.20, ganancia: 864.74 },
+      { mes: 2, label: "Febrero", qty: 45, facturado: 4624.40, ganancia: 2011.84 },
+      { mes: 3, label: "Marzo", qty: 58, facturado: 9458.86, ganancia: 2734.23 },
+      { mes: 4, label: "Abril", qty: 81, facturado: 6106.00, ganancia: 2574.46 },
+      { mes: 5, label: "Mayo", qty: 75.45, facturado: 9399.92, ganancia: 3322.56 },
+      { mes: 6, label: "Junio", qty: 47, facturado: 3206.00, ganancia: 1432.09 },
+      { mes: 7, label: "Julio", qty: 109, facturado: 23181.86, ganancia: 4100.01 },
+      { mes: 8, label: "Agosto", qty: 83.6, facturado: 6811.15, ganancia: 2406.03 },
+      { mes: 9, label: "Septiembre", qty: 129.05, facturado: 14683.09, ganancia: 4327.11 },
+      { mes: 10, label: "Octubre", qty: 17, facturado: 4618.00, ganancia: 1645.38 }
     ];
 
     let selectedMonth = 'ALL';
 
+    // Catálogos base ordenados por mayor ganancia en dólares ($)
     const categoryCatalogs = {
       ACCESORIOS: [
-        { name: "PROTECTOR CARTER 4601P181A", category: "ACCESORIOS", qty: 1, facturado: 15.00, ganancia: 6.89, margen: 45.93 },
-        { name: "EMPUÑADURA ALTO RENDIMIENTO PANIGALE", category: "ACCESORIOS", qty: 1, facturado: 120.00, ganancia: 41.00, margen: 34.17 },
-        { name: "PUÑOS CALEFACTADOS 96680701B", category: "ACCESORIOS", qty: 1, facturado: 438.00, ganancia: 131.40, margen: 30.00 },
-        { name: "MALETAS LATERALES DE ALUMINIO 96782441AA", category: "ACCESORIOS", qty: 1, facturado: 1876.00, ganancia: 562.80, margen: 30.00 },
-        { name: "SET PLACA TOP CASE V21E 96782361AA", category: "ACCESORIOS", qty: 2, facturado: 500.00, ganancia: 99.22, margen: 19.84 },
-        { name: "BOLSAS LATERALES BLANDAS V20B", category: "ACCESORIOS", qty: 1, facturado: 320.00, ganancia: 62.77, margen: 19.62 },
-        { name: "PAQUETE ACCESORIOS SPORT HYPERMOTARD", category: "ACCESORIOS", qty: 1, facturado: 2518.00, ganancia: 412.35, margen: 16.38 },
-        { name: "COBERTOR DE PANIGALE 97580151AA", category: "ACCESORIOS", qty: 1, facturado: 410.00, ganancia: 54.00, margen: 13.17 },
-        { name: "BAUL TRASERO 96782371AA", category: "ACCESORIOS", qty: 1, facturado: 560.00, ganancia: 68.52, margen: 12.24 },
-        { name: "RED TOP CASE COVER 96781541AA", category: "ACCESORIOS", qty: 1, facturado: 190.00, ganancia: 22.14, margen: 11.65 }
+        { name: "MALETAS LATERALES DE ALUMINIO 96782441AA", category: "ACCESORIOS", qty: 1, facturado: 1876.00, ganancia: 562.80 },
+        { name: "PAQUETE ACCESORIOS SPORT HYPERMOTARD", category: "ACCESORIOS", qty: 1, facturado: 2518.00, ganancia: 412.35 },
+        { name: "PUÑOS CALEFACTADOS 96680701B", category: "ACCESORIOS", qty: 1, facturado: 438.00, ganancia: 131.40 },
+        { name: "SET PLACA TOP CASE V21E 96782361AA", category: "ACCESORIOS", qty: 2, facturado: 500.00, ganancia: 99.22 },
+        { name: "BAUL TRASERO 96782371AA", category: "ACCESORIOS", qty: 1, facturado: 560.00, ganancia: 68.52 },
+        { name: "BOLSAS LATERALES BLANDAS V20B", category: "ACCESORIOS", qty: 1, facturado: 320.00, ganancia: 62.77 },
+        { name: "COBERTOR DE PANIGALE 97580151AA", category: "ACCESORIOS", qty: 1, facturado: 410.00, ganancia: 54.00 },
+        { name: "EMPUÑADURA ALTO RENDIMIENTO PANIGALE", category: "ACCESORIOS", qty: 1, facturado: 120.00, ganancia: 41.00 },
+        { name: "RED TOP CASE COVER 96781541AA", category: "ACCESORIOS", qty: 1, facturado: 190.00, ganancia: 22.14 },
+        { name: "PROTECTOR CARTER 4601P181A", category: "ACCESORIOS", qty: 1, facturado: 15.00, ganancia: 6.89 }
       ],
       REPUESTOS: [
-        { name: "ARANDELA 85250541A", category: "REPUESTOS", qty: 1, facturado: 5.00, ganancia: 4.27, margen: 85.40 },
-        { name: "JUNTA ALUMINIO 22032083A", category: "REPUESTOS", qty: 2, facturado: 8.00, ganancia: 6.54, margen: 81.75 },
-        { name: "FILTRO DE ACEITE PREMIUM KN-159", category: "REPUESTOS", qty: 5, facturado: 182.00, ganancia: 122.00, margen: 67.03 },
-        { name: "FILTRO DE ACEITE 44440039A", category: "REPUESTOS", qty: 6, facturado: 168.00, ganancia: 102.12, margen: 60.79 },
-        { name: "BUJIA NGK DUCATI MAR9A", category: "REPUESTOS", qty: 6, facturado: 276.00, ganancia: 138.42, margen: 50.15 },
-        { name: "RETROVISOR DERECHO HYPERMOTARD", category: "REPUESTOS", qty: 1, facturado: 167.20, ganancia: 74.21, margen: 44.38 },
-        { name: "FILTRO ACEITE SUPERBIKE 899/1199", category: "REPUESTOS", qty: 4, facturado: 188.00, ganancia: 82.08, margen: 43.66 },
-        { name: "FILTRO DE AIRE MULTISTRADA", category: "REPUESTOS", qty: 2, facturado: 56.00, ganancia: 22.68, margen: 40.50 },
-        { name: "JUEGO SELLO HORQUILLA DELANTERA", category: "REPUESTOS", qty: 2, facturado: 190.00, ganancia: 69.00, margen: 36.32 },
-        { name: "KIT DE REPARACION 42520021A", category: "REPUESTOS", qty: 2, facturado: 110.00, ganancia: 36.32, margen: 33.02 }
+        { name: "BUJIA NGK DUCATI MAR9A", category: "REPUESTOS", qty: 6, facturado: 276.00, ganancia: 138.42 },
+        { name: "FILTRO DE ACEITE PREMIUM KN-159", category: "REPUESTOS", qty: 5, facturado: 182.00, ganancia: 122.00 },
+        { name: "FILTRO DE ACEITE 44440039A", category: "REPUESTOS", qty: 6, facturado: 168.00, ganancia: 102.12 },
+        { name: "FILTRO ACEITE SUPERBIKE 899/1199", category: "REPUESTOS", qty: 4, facturado: 188.00, ganancia: 82.08 },
+        { name: "RETROVISOR DERECHO HYPERMOTARD", category: "REPUESTOS", qty: 1, facturado: 167.20, ganancia: 74.21 },
+        { name: "JUEGO SELLO HORQUILLA DELANTERA", category: "REPUESTOS", qty: 2, facturado: 190.00, ganancia: 69.00 },
+        { name: "KIT DE REPARACION 42520021A", category: "REPUESTOS", qty: 2, facturado: 110.00, ganancia: 36.32 },
+        { name: "FILTRO DE AIRE MULTISTRADA", category: "REPUESTOS", qty: 2, facturado: 56.00, ganancia: 22.68 },
+        { name: "JUNTA ALUMINIO 22032083A", category: "REPUESTOS", qty: 2, facturado: 8.00, ganancia: 6.54 },
+        { name: "ARANDELA 85250541A", category: "REPUESTOS", qty: 1, facturado: 5.00, ganancia: 4.27 }
       ],
       APPAREL: [
-        { name: "JARCON GORRA", category: "APPAREL", qty: 4, facturado: 240.00, ganancia: 108.24, margen: 45.10 },
-        { name: "CAP EXPLORER GORRA", category: "APPAREL", qty: 1, facturado: 60.00, ganancia: 27.06, margen: 45.10 },
-        { name: "PANTALON STRADA V3 NEGRO (TALLA L)", category: "APPAREL", qty: 1, facturado: 120.00, ganancia: 41.63, margen: 34.69 },
-        { name: "GUANTES DUCATI (TALLA L)", category: "APPAREL", qty: 1, facturado: 68.00, ganancia: 22.80, margen: 33.53 },
-        { name: "CHAQUETA CARRERA STRADA C5 (54)", category: "APPAREL", qty: 1, facturado: 410.00, ganancia: 130.00, margen: 31.71 },
-        { name: "CHAQUETA DE PIEL C4 NEGRO/ROJO (50)", category: "APPAREL", qty: 1, facturado: 450.00, ganancia: 130.00, margen: 28.89 },
-        { name: "CHAQUETA DE PIEL C4 NEGRO/ROJO (52)", category: "APPAREL", qty: 1, facturado: 450.00, ganancia: 130.00, margen: 28.89 },
-        { name: "PANTALON EXPLORER HOMBRE (XL)", category: "APPAREL", qty: 1, facturado: 150.00, ganancia: 40.00, margen: 26.67 },
-        { name: "CHAQUETA DE MOTO HOMBRE (L)", category: "APPAREL", qty: 1, facturado: 380.00, ganancia: 95.00, margen: 25.00 },
-        { name: "CUELLO DUCATI CORSE ADRENALINE", category: "APPAREL", qty: 2, facturado: 34.40, ganancia: 7.14, margen: 20.75 }
+        { name: "CHAQUETA CARRERA STRADA C5 (54)", category: "APPAREL", qty: 1, facturado: 410.00, ganancia: 130.00 },
+        { name: "CHAQUETA DE PIEL C4 NEGRO/ROJO (50)", category: "APPAREL", qty: 1, facturado: 450.00, ganancia: 130.00 },
+        { name: "CHAQUETA DE PIEL C4 NEGRO/ROJO (52)", category: "APPAREL", qty: 1, facturado: 450.00, ganancia: 130.00 },
+        { name: "JARCON GORRA", category: "APPAREL", qty: 4, facturado: 240.00, ganancia: 108.24 },
+        { name: "CHAQUETA DE MOTO HOMBRE (L)", category: "APPAREL", qty: 1, facturado: 380.00, ganancia: 95.00 },
+        { name: "PANTALON STRADA V3 NEGRO (TALLA L)", category: "APPAREL", qty: 1, facturado: 120.00, ganancia: 41.63 },
+        { name: "PANTALON EXPLORER HOMBRE (XL)", category: "APPAREL", qty: 1, facturado: 150.00, ganancia: 40.00 },
+        { name: "CAP EXPLORER GORRA", category: "APPAREL", qty: 1, facturado: 60.00, ganancia: 27.06 },
+        { name: "GUANTES DUCATI (TALLA L)", category: "APPAREL", qty: 1, facturado: 68.00, ganancia: 22.80 },
+        { name: "CUELLO DUCATI CORSE ADRENALINE", category: "APPAREL", qty: 2, facturado: 34.40, ganancia: 7.14 }
       ]
     };
 
     const initialCategories = [
-      { name: 'ACCESORIOS', qty: 45, facturado: 31334.54, ganancia: 5228.45, margen: 16.69 },
-      { name: 'REPUESTOS', qty: 376, facturado: 19896.93, ganancia: 8307.29, margen: 41.75 },
-      { name: 'APPAREL', qty: 102, facturado: 19244.01, ganancia: 5409.51, margen: 28.11 },
-      { name: 'MANO DE OBRA', qty: 161.1, facturado: 13388.00, ganancia: 6473.20, margen: 48.35 }
+      { name: 'ACCESORIOS', qty: 45, facturado: 31334.54, ganancia: 5228.45 },
+      { name: 'REPUESTOS', qty: 376, facturado: 19896.93, ganancia: 8307.29 },
+      { name: 'APPAREL', qty: 102, facturado: 19244.01, ganancia: 5409.51 },
+      { name: 'MANO DE OBRA', qty: 161.1, facturado: 13388.00, ganancia: 6473.20 }
     ];
 
     let selectedCategory = 'ACCESORIOS';
-    let sortColumn = 'margen';
+    let sortColumn = 'ganancia'; // Orden por defecto: mayor ganancia ($)
     let sortDirection = 'desc';
 
     const formatCurrency = (val) => '$' + Number(val || 0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -405,16 +473,15 @@
         const totFact = monthlyData.reduce((a, b) => a + b.facturado, 0);
         const totProf = monthlyData.reduce((a, b) => a + b.ganancia, 0);
         const totQty = monthlyData.reduce((a, b) => a + b.qty, 0);
-        const avgMarg = totFact > 0 ? (totProf / totFact) * 100 : 0;
 
-        updateKPIs(totFact, totProf, avgMarg, totQty, "Total acumulado anual");
-        renderPeriodDetail({ label: "Todo el Año", facturado: totFact, ganancia: totProf, margen: avgMarg, qty: totQty });
+        updateKPIs(totFact, totProf, totQty, "Total acumulado anual");
+        renderPeriodDetail({ label: "Todo el Año", facturado: totFact, ganancia: totProf, qty: totQty });
       } else {
         const item = monthlyData.find(d => d.mes === mIndex);
         if (item) {
           labelEl.innerText = `Viendo: ${item.label} (Mes ${item.mes})`;
           detailSubtitle.innerText = `Detalle exclusivo de ${item.label}`;
-          updateKPIs(item.facturado, item.ganancia, item.margen, item.qty, `Mes ${item.mes}`);
+          updateKPIs(item.facturado, item.ganancia, item.qty, `Mes ${item.mes}`);
           renderPeriodDetail(item);
         }
       }
@@ -422,14 +489,13 @@
       updateMonthlyChartHighlight();
     }
 
-    function updateKPIs(fact, prof, marg, qty, subText) {
+    function updateKPIs(fact, prof, qty, subText) {
       document.getElementById('kpiFacturado').innerText = formatCurrency(fact);
       document.getElementById('kpiGanancia').innerText = formatCurrency(prof);
-      document.getElementById('kpiMargen').innerText = marg.toFixed(2) + '%';
       document.getElementById('kpiCantidad').innerText = Number(qty).toLocaleString('es-ES');
 
       document.getElementById('kpiFacturadoSub').innerText = subText;
-      document.getElementById('kpiGananciaSub').innerText = `Rentabilidad: ${subText}`;
+      document.getElementById('kpiGananciaSub').innerText = `Ganancia: ${subText}`;
     }
 
     function renderPeriodDetail(item) {
@@ -448,10 +514,6 @@
           <span class="text-sm font-bold text-emerald-600">${formatCurrency(item.ganancia)}</span>
         </div>
         <div class="p-3 bg-slate-50 rounded-lg flex justify-between items-center">
-          <span class="text-xs font-medium text-slate-500">Margen de Rentabilidad</span>
-          <span class="text-sm font-bold text-indigo-600">${item.margen.toFixed(2)}%</span>
-        </div>
-        <div class="p-3 bg-slate-50 rounded-lg flex justify-between items-center">
           <span class="text-xs font-medium text-slate-500">Unidades Facturadas</span>
           <span class="text-sm font-bold text-slate-700">${Number(item.qty).toLocaleString('es-ES')}</span>
         </div>
@@ -459,7 +521,7 @@
     }
 
     function initCharts() {
-      // 1. Gráfico Mensual
+      // 1. Gráfico Mensual (Facturado vs Ganancia $)
       const ctxMonthly = document.getElementById('monthlyTrendChart').getContext('2d');
       monthlyChart = new Chart(ctxMonthly, {
         type: 'bar',
@@ -471,26 +533,14 @@
               label: 'Facturado ($)',
               data: monthlyData.map(d => d.facturado),
               backgroundColor: '#3b82f6',
-              borderRadius: 6,
-              yAxisID: 'y'
+              borderRadius: 6
             },
             {
               type: 'bar',
               label: 'Ganancia ($)',
               data: monthlyData.map(d => d.ganancia),
               backgroundColor: '#10b981',
-              borderRadius: 6,
-              yAxisID: 'y'
-            },
-            {
-              type: 'line',
-              label: 'Margen %',
-              data: monthlyData.map(d => d.margen),
-              borderColor: '#6366f1',
-              backgroundColor: '#6366f1',
-              borderWidth: 2,
-              pointRadius: 4,
-              yAxisID: 'y1'
+              borderRadius: 6
             }
           ]
         },
@@ -499,19 +549,18 @@
           maintainAspectRatio: false,
           interaction: { mode: 'index', intersect: false },
           scales: {
-            y: { beginAtZero: true, ticks: { callback: v => '$' + Number(v).toLocaleString('es-ES') } },
-            y1: { position: 'right', grid: { drawOnChartArea: false }, ticks: { callback: v => v + '%' } }
+            y: { beginAtZero: true, ticks: { callback: v => '$' + Number(v).toLocaleString('es-ES') } }
           }
         }
       });
 
-      // 2. Gráfico Horizontal de Top 10
+      // 2. Gráfico Horizontal de Top 10 por Ganancia ($)
       const ctxTop = document.getElementById('topProductsChart').getContext('2d');
       topProductsChart = new Chart(ctxTop, {
         type: 'bar',
         data: {
           labels: [],
-          datasets: [{ label: '% Ganancia', data: [], backgroundColor: '#2563eb', borderRadius: 6 }]
+          datasets: [{ label: 'Ganancia ($)', data: [], backgroundColor: '#10b981', borderRadius: 6 }]
         },
         options: {
           indexAxis: 'y',
@@ -522,7 +571,6 @@
             tooltip: {
               callbacks: {
                 label: (ctx) => {
-                  if (sortColumn === 'margen') return `% Ganancia: ${ctx.parsed.x.toFixed(2)}%`;
                   if (sortColumn === 'qty') return `Cantidad: ${ctx.parsed.x} uds`;
                   return `Monto: ${formatCurrency(ctx.parsed.x)}`;
                 }
@@ -533,7 +581,7 @@
             x: {
               beginAtZero: true,
               ticks: {
-                callback: v => sortColumn === 'margen' ? v + '%' : (sortColumn === 'qty' ? v : '$' + Number(v).toLocaleString('es-ES'))
+                callback: v => sortColumn === 'qty' ? v : '$' + Number(v).toLocaleString('es-ES')
               }
             }
           }
@@ -560,7 +608,7 @@
         }
       });
 
-      // 4. Gráfico de Dona
+      // 4. Gráfico de Dona por Categorías
       const ctxDonut = document.getElementById('categoryDonutChart').getContext('2d');
       donutChart = new Chart(ctxDonut, {
         type: 'doughnut',
@@ -581,10 +629,35 @@
             tooltip: {
               callbacks: {
                 label: function(ctx) {
-                  const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
-                  const pct = total > 0 ? ((ctx.parsed / total) * 100).toFixed(1) : 0;
-                  return `${ctx.label}: ${formatCurrency(ctx.parsed)} (${pct}%)`;
+                  return `${ctx.label}: ${formatCurrency(ctx.parsed)}`;
                 }
+              }
+            }
+          }
+        }
+      });
+
+      // 5. Gráfico de Composición de Taller
+      const ctxTaller = document.getElementById('tallerChart').getContext('2d');
+      tallerChart = new Chart(ctxTaller, {
+        type: 'doughnut',
+        data: {
+          labels: ['Mano de Obra', 'Diagnóstico DDS'],
+          datasets: [{
+            data: [10888, 2500],
+            backgroundColor: ['#a855f7', '#6366f1'],
+            hoverOffset: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '60%',
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => `${ctx.label}: ${formatCurrency(ctx.parsed)}`
               }
             }
           }
@@ -619,9 +692,9 @@
       });
 
       const titleEl = document.getElementById('rankingSectionTitle');
-      if (category === 'ACCESORIOS') titleEl.innerText = 'Top 10: Accesorios (% Ganancia)';
-      else if (category === 'REPUESTOS') titleEl.innerText = 'Top 10: Repuestos (% Ganancia)';
-      else if (category === 'APPAREL') titleEl.innerText = 'Top 10: Apparel / Indumentaria (% Ganancia)';
+      if (category === 'ACCESORIOS') titleEl.innerText = 'Top 10: Accesorios con Mayor Ganancia ($)';
+      else if (category === 'REPUESTOS') titleEl.innerText = 'Top 10: Repuestos con Mayor Ganancia ($)';
+      else if (category === 'APPAREL') titleEl.innerText = 'Top 10: Apparel con Mayor Ganancia ($)';
 
       renderCurrentRanking();
     }
@@ -657,7 +730,8 @@
 
       const top10 = items.slice(0, 10);
 
-      ['name', 'category', 'qty', 'facturado', 'ganancia', 'margen'].forEach(c => {
+      // Iconos de ordenamiento en cabeceras
+      ['name', 'category', 'qty', 'facturado', 'ganancia'].forEach(c => {
         const icon = document.getElementById('sortIcon_' + c);
         const th = icon ? icon.closest('th') : null;
         if (!icon || !th) return;
@@ -673,11 +747,12 @@
         }
       });
 
+      // Tabla
       const tbody = document.getElementById('topTableBody');
       tbody.innerHTML = '';
 
       if (top10.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400 text-sm">No hay productos disponibles para ${selectedCategory}.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-400 text-sm">No hay productos disponibles para ${selectedCategory}.</td></tr>`;
         return;
       }
 
@@ -701,26 +776,14 @@
             <td class="py-3 px-4 text-center font-medium text-slate-700">${item.qty.toLocaleString('es-ES')}</td>
             <td class="py-3 px-4 text-right text-slate-700 font-medium">${formatCurrency(item.facturado)}</td>
             <td class="py-3 px-4 text-right font-bold text-emerald-600">${formatCurrency(item.ganancia)}</td>
-            <td class="py-3 px-4 text-center">
-              <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800">
-                ${Number(item.margen || 0).toFixed(2)}%
-              </span>
-            </td>
           </tr>
         `;
       });
 
+      // Gráfico Canvas
       topProductsChart.data.labels = top10.map(p => p.name.length > 28 ? p.name.substring(0, 28) + '...' : p.name);
       
-      let themeColor = '#2563eb';
-      if (selectedCategory === 'APPAREL') themeColor = '#6366f1';
-      else if (selectedCategory === 'REPUESTOS') themeColor = '#f59e0b';
-
-      if (sortColumn === 'margen') {
-        topProductsChart.data.datasets[0].data = top10.map(p => p.margen);
-        topProductsChart.data.datasets[0].label = '% Ganancia';
-        topProductsChart.data.datasets[0].backgroundColor = themeColor;
-      } else if (sortColumn === 'ganancia') {
+      if (sortColumn === 'ganancia') {
         topProductsChart.data.datasets[0].data = top10.map(p => p.ganancia);
         topProductsChart.data.datasets[0].label = 'Ganancia ($)';
         topProductsChart.data.datasets[0].backgroundColor = '#10b981';
@@ -754,11 +817,6 @@
             <td class="py-4 px-6 text-center text-slate-600">${cat.qty.toLocaleString('es-ES')}</td>
             <td class="py-4 px-6 text-right font-medium text-slate-900">${formatCurrency(cat.facturado)}</td>
             <td class="py-4 px-6 text-right font-semibold text-emerald-600">${formatCurrency(cat.ganancia)}</td>
-            <td class="py-4 px-6 text-center">
-              <span class="px-2.5 py-1 text-xs rounded-full font-semibold ${cat.margen >= 40 ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-700'}">
-                ${cat.margen.toFixed(2)}%
-              </span>
-            </td>
           </tr>
         `;
       });
@@ -801,11 +859,8 @@
             const mQty = parseGoogleNumber(cells[2]);
             const mFact = parseGoogleNumber(cells[3]);
             const mProf = parseGoogleNumber(cells[4]);
-            let mMarg = parseGoogleNumber(cells[5]);
-            if (mMarg > 0 && mMarg < 1) mMarg = mMarg * 100;
-
             const name = monthNames[mesNum - 1] || `Mes ${mesNum}`;
-            parsedMonths.push({ mes: mesNum, label: name, qty: mQty, facturado: mFact, ganancia: mProf, margen: mMarg });
+            parsedMonths.push({ mes: mesNum, label: name, qty: mQty, facturado: mFact, ganancia: mProf });
           }
         }
 
@@ -833,10 +888,7 @@
         }
       });
 
-      const parsedCategories = Object.values(categoryMap).map(c => ({
-        ...c,
-        margen: c.facturado > 0 ? (c.ganancia / c.facturado) * 100 : 0
-      }));
+      const parsedCategories = Object.values(categoryMap);
 
       if (parsedMonths.length > 0) {
         monthlyData = parsedMonths;
@@ -845,7 +897,6 @@
         monthlyChart.data.labels = monthlyData.map(d => d.label);
         monthlyChart.data.datasets[0].data = monthlyData.map(d => d.facturado);
         monthlyChart.data.datasets[1].data = monthlyData.map(d => d.ganancia);
-        monthlyChart.data.datasets[2].data = monthlyData.map(d => d.margen);
         monthlyChart.update();
       }
 
@@ -865,7 +916,7 @@
       const rows = json.table.rows;
       if (rows.length === 0) return;
 
-      let idxDesc = 3, idxCat = 4, idxQty = 7, idxFact = 10, idxProfit = 11, idxPercent = 12;
+      let idxDesc = 3, idxCat = 4, idxQty = 7, idxFact = 10, idxProfit = 11;
 
       for (let r = 0; r < Math.min(15, rows.length); r++) {
         const c = rows[r].c;
@@ -877,7 +928,6 @@
           if (val === 'cant' || val === 'cantidad') idxQty = col;
           if (val.includes('facturado') || val.includes('monto')) idxFact = col;
           if (val.includes('ganancia') && !val.includes('%')) idxProfit = col;
-          if (val.includes('%') || val.includes('margen')) idxPercent = col;
         }
       }
 
@@ -917,32 +967,19 @@
         const qty = parseGoogleNumber(c[idxQty]);
         const fact = parseGoogleNumber(c[idxFact]);
         const profit = parseGoogleNumber(c[idxProfit]);
-        
-        let percentCol = c[idxPercent] ? parseGoogleNumber(c[idxPercent]) : 0;
-        if (percentCol > 0 && percentCol < 1) percentCol = percentCol * 100;
 
         if (!maps[catKey][desc]) {
-          maps[catKey][desc] = { name: desc, category: catKey, qty: 0, facturado: 0, ganancia: 0, percentCol: percentCol };
+          maps[catKey][desc] = { name: desc, category: catKey, qty: 0, facturado: 0, ganancia: 0 };
         }
         maps[catKey][desc].qty += qty;
         maps[catKey][desc].facturado += fact;
         maps[catKey][desc].ganancia += profit;
-        if (percentCol > maps[catKey][desc].percentCol) {
-          maps[catKey][desc].percentCol = percentCol;
-        }
       });
 
       ['ACCESORIOS', 'REPUESTOS', 'APPAREL'].forEach(key => {
         const liveItems = Object.values(maps[key]);
         if (liveItems.length >= 3) {
-          categoryCatalogs[key] = liveItems.map(p => {
-            const calculatedMargen = p.facturado > 0 ? (p.ganancia / p.facturado) * 100 : 0;
-            const finalMargen = (p.percentCol > 0 && isFinite(p.percentCol)) ? p.percentCol : calculatedMargen;
-            return {
-              ...p,
-              margen: isFinite(finalMargen) ? finalMargen : 0
-            };
-          });
+          categoryCatalogs[key] = liveItems;
         }
       });
 
@@ -954,7 +991,6 @@
       fetchSheetJSONP('Ventas', 'handleVentasData');
     }
 
-    // Inicialización al abrir
     window.onload = () => {
       initCharts();
       renderMonthButtons();

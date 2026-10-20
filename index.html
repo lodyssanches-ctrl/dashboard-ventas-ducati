@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard en Vivo - Top 10 por Categoría</title>
+  <title>Dashboard en Vivo - Facturación y Top 10</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Chart.js para Canvas -->
@@ -19,25 +19,50 @@
     .th-sortable:hover {
       background-color: #f1f5f9;
     }
+
+    /* Reglas para imprimir o guardar en PDF */
+    @media print {
+      body {
+        background-color: #ffffff !important;
+        padding: 0 !important;
+      }
+      .no-print, header button, #monthButtonsContainer, #syncStatus {
+        display: none !important;
+      }
+      .max-w-7xl {
+        max-width: 100% !important;
+        margin: 0 !important;
+      }
+      section {
+        box-shadow: none !important;
+        border: 1px solid #cbd5e1 !important;
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+    }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen p-4 md:p-8">
 
   <div class="max-w-7xl mx-auto space-y-6">
 
-    <!-- Encabezado con estado -->
+    <!-- Encabezado con estado y botón de Exportar / Imprimir -->
     <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200">
       <div>
         <h1 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Dashboard de Ventas y Rentabilidad</h1>
         <p class="text-sm text-slate-500 mt-1">Sincronización en vivo con Google Sheets (Indicadores mensuales y Top 10)</p>
       </div>
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2">
         <span id="syncStatus" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
           ● Datos Activos
         </span>
-        <button onclick="fetchAllLiveData()" class="px-4 py-2 text-sm font-medium bg-white border border-slate-300 rounded-lg shadow-sm hover:bg-slate-100 transition flex items-center gap-2">
-          <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-          Actualizar ahora
+        <button onclick="fetchAllLiveData()" class="no-print px-3.5 py-2 text-sm font-medium bg-white border border-slate-300 rounded-lg shadow-sm hover:bg-slate-100 transition flex items-center gap-1.5 text-slate-700">
+          <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          Sincronizar
+        </button>
+        <button onclick="window.print()" class="no-print px-4 py-2 text-sm font-semibold bg-slate-900 text-white rounded-lg shadow-sm hover:bg-slate-800 transition flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+          Imprimir / PDF
         </button>
       </div>
     </header>
@@ -55,7 +80,7 @@
       </div>
 
       <!-- Botones de Selección de Mes -->
-      <div class="flex flex-wrap items-center gap-2 pt-1" id="monthButtonsContainer"></div>
+      <div class="flex flex-wrap items-center gap-2 pt-1 no-print" id="monthButtonsContainer"></div>
     </section>
 
     <!-- Tarjetas de KPIs Generales -->
@@ -126,7 +151,7 @@
         </div>
 
         <!-- Pestañas Específicas por Categoría -->
-        <div class="flex flex-wrap items-center gap-2 bg-slate-100 p-1.5 rounded-xl">
+        <div class="flex flex-wrap items-center gap-2 bg-slate-100 p-1.5 rounded-xl no-print">
           <button onclick="selectCategory('ACCESORIOS')" id="tab_ACCESORIOS" class="px-4 py-2 text-xs font-bold rounded-lg transition bg-white text-slate-900 shadow-sm">
             Top 10 Accesorios
           </button>
@@ -277,7 +302,6 @@
 
     let selectedMonth = 'ALL';
 
-    // Top 10 reales garantizados de la hoja de cálculo
     const categoryCatalogs = {
       ACCESORIOS: [
         { name: "PROTECTOR CARTER 4601P181A", category: "ACCESORIOS", qty: 1, facturado: 15.00, ganancia: 6.89, margen: 45.93 },
@@ -615,7 +639,6 @@
     function renderCurrentRanking() {
       let items = [...(categoryCatalogs[selectedCategory] || [])];
 
-      // Orden seguro que previene valores nulos o NaN
       items.sort((a, b) => {
         let valA = a[sortColumn];
         let valB = b[sortColumn];
@@ -634,7 +657,6 @@
 
       const top10 = items.slice(0, 10);
 
-      // Iconos de ordenamiento
       ['name', 'category', 'qty', 'facturado', 'ganancia', 'margen'].forEach(c => {
         const icon = document.getElementById('sortIcon_' + c);
         const th = icon ? icon.closest('th') : null;
@@ -642,16 +664,15 @@
 
         if (c === sortColumn) {
           icon.innerText = sortDirection === 'asc' ? '↑' : '↓';
-          icon.className = 'text-indigo-600 font-bold';
-          th.classList.add('bg-indigo-50/60');
+          icon.className = 'text-blue-600 font-bold';
+          th.classList.add('bg-blue-50/60');
         } else {
           icon.innerText = '↕';
           icon.className = 'text-slate-400 font-normal';
-          th.classList.remove('bg-indigo-50/60');
+          th.classList.remove('bg-blue-50/60');
         }
       });
 
-      // Tabla
       const tbody = document.getElementById('topTableBody');
       tbody.innerHTML = '';
 
@@ -681,7 +702,7 @@
             <td class="py-3 px-4 text-right text-slate-700 font-medium">${formatCurrency(item.facturado)}</td>
             <td class="py-3 px-4 text-right font-bold text-emerald-600">${formatCurrency(item.ganancia)}</td>
             <td class="py-3 px-4 text-center">
-              <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800">
+              <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800">
                 ${Number(item.margen || 0).toFixed(2)}%
               </span>
             </td>
@@ -689,7 +710,6 @@
         `;
       });
 
-      // Gráfico Canvas
       topProductsChart.data.labels = top10.map(p => p.name.length > 28 ? p.name.substring(0, 28) + '...' : p.name);
       
       let themeColor = '#2563eb';
@@ -877,9 +897,8 @@
 
         if (descUpper.includes('DESCRIPCION') || descUpper.includes('REPORTE DE VENTA')) return;
 
-        // Detección híbrida infalible para Accesorios
         let catKey = null;
-        if (rawCat.includes('ACCESORIO') || descUpper.includes('MALETA') || descUpper.includes('BAUL') || descUpper.includes('PROTECTOR CARTER') || descUpper.includes('PUÑOS CALEFACTADOS')) {
+        if (rawCat.includes('ACCESORIO') || descUpper.includes('MALETA') || descUpper.includes('BAUL') || descUpper.includes('PROTECTOR CARTER') || descUpper.includes('PUÑOS CALEFACTADOS') || descUpper.includes('BOLSA')) {
           catKey = 'ACCESORIOS';
         } else if (rawCat.includes('APPAREL') || rawCat.includes('ROPA') || rawCat.includes('INDUMENTARIA') || descUpper.includes('GORRA') || descUpper.includes('PANTALON') || descUpper.includes('CHAQUETA')) {
           catKey = 'APPAREL';
@@ -898,6 +917,7 @@
         const qty = parseGoogleNumber(c[idxQty]);
         const fact = parseGoogleNumber(c[idxFact]);
         const profit = parseGoogleNumber(c[idxProfit]);
+        
         let percentCol = c[idxPercent] ? parseGoogleNumber(c[idxPercent]) : 0;
         if (percentCol > 0 && percentCol < 1) percentCol = percentCol * 100;
 
@@ -914,13 +934,13 @@
 
       ['ACCESORIOS', 'REPUESTOS', 'APPAREL'].forEach(key => {
         const liveItems = Object.values(maps[key]);
-        if (liveItems.length > 0) {
+        if (liveItems.length >= 3) {
           categoryCatalogs[key] = liveItems.map(p => {
-            const calculated = p.facturado > 0 ? (p.ganancia / p.facturado) * 100 : 0;
-            const validMargen = (p.percentCol > 0 && isFinite(p.percentCol)) ? p.percentCol : calculated;
+            const calculatedMargen = p.facturado > 0 ? (p.ganancia / p.facturado) * 100 : 0;
+            const finalMargen = (p.percentCol > 0 && isFinite(p.percentCol)) ? p.percentCol : calculatedMargen;
             return {
               ...p,
-              margen: isFinite(validMargen) ? validMargen : 0
+              margen: isFinite(finalMargen) ? finalMargen : 0
             };
           });
         }
@@ -940,7 +960,7 @@
       renderMonthButtons();
       selectMonth('ALL');
       renderCategories(initialCategories);
-      selectCategory('ACCESORIOS'); // Inicia mostrando directamente el Top 10 de Accesorios
+      selectCategory('ACCESORIOS');
       fetchAllLiveData();
       setInterval(fetchAllLiveData, 30000);
     };

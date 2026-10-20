@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard en Vivo - Accesorios y Repuestos</title>
+  <title>Dashboard en Vivo - Ventas y Repuestos</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Chart.js para Canvas -->
@@ -15,55 +15,55 @@
 
   <div class="max-w-7xl mx-auto space-y-6">
 
-    <!-- Encabezado -->
+    <!-- Encabezado con estado en vivo -->
     <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200">
       <div>
-        <h1 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Dashboard de Ventas en Tiempo Real</h1>
-        <p class="text-sm text-slate-500 mt-1">Conectado directamente a Google Sheets mediante Apps Script</p>
+        <h1 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Dashboard de Ventas en Vivo</h1>
+        <p class="text-sm text-slate-500 mt-1">Conexión directa en tiempo real con Google Sheets</p>
       </div>
       <div class="flex items-center gap-3">
-        <span id="syncBadge" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">
-          ● Conectando...
+        <span id="syncStatus" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">
+          ● Consultando hoja...
         </span>
-        <button onclick="loadLiveData()" class="px-4 py-2 text-sm font-medium bg-white border border-slate-300 rounded-lg shadow-sm hover:bg-slate-100 transition flex items-center gap-2">
+        <button onclick="fetchLiveData()" class="px-4 py-2 text-sm font-medium bg-white border border-slate-300 rounded-lg shadow-sm hover:bg-slate-100 transition flex items-center gap-2">
           <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-          Sincronizar
+          Actualizar ahora
         </button>
       </div>
     </header>
 
-    <!-- KPIs Principales -->
+    <!-- Tarjetas de KPIs -->
     <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
         <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Facturado Total</p>
-        <h2 class="text-2xl font-bold text-slate-900 mt-1" id="kpiFacturado">$0,00</h2>
-        <span class="text-xs text-blue-600 font-medium">Facturación bruta en vivo</span>
+        <h2 class="text-2xl font-bold text-slate-900 mt-1" id="kpiFacturado">--</h2>
+        <span class="text-xs text-blue-600 font-medium">Facturación bruta</span>
       </div>
 
       <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
         <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Ganancia Total</p>
-        <h2 class="text-2xl font-bold text-emerald-600 mt-1" id="kpiGanancia">$0,00</h2>
-        <span class="text-xs text-emerald-700 font-medium">Margen operativo acumulado</span>
+        <h2 class="text-2xl font-bold text-emerald-600 mt-1" id="kpiGanancia">--</h2>
+        <span class="text-xs text-emerald-700 font-medium">Margen operativo</span>
       </div>
 
       <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
         <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Margen Promedio</p>
-        <h2 class="text-2xl font-bold text-indigo-600 mt-1" id="kpiMargen">0,00%</h2>
+        <h2 class="text-2xl font-bold text-indigo-600 mt-1" id="kpiMargen">--</h2>
         <span class="text-xs text-slate-500 font-medium">Rentabilidad global</span>
       </div>
 
       <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Unidades / Servicios</p>
-        <h2 class="text-2xl font-bold text-slate-900 mt-1" id="kpiCantidad">0</h2>
+        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Cantidad / Horas</p>
+        <h2 class="text-2xl font-bold text-slate-900 mt-1" id="kpiCantidad">--</h2>
         <span class="text-xs text-slate-500 font-medium">Total despachado</span>
       </div>
     </section>
 
-    <!-- Gráficos Canvas -->
+    <!-- Gráficos en Canvas -->
     <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm lg:col-span-2">
         <h3 class="font-semibold text-slate-800 text-lg">Facturación vs. Ganancia por Categoría</h3>
-        <p class="text-xs text-slate-400 mb-4">Actualizado automáticamente desde la hoja</p>
+        <p class="text-xs text-slate-400 mb-4">Datos actualizados al instante en dólares ($)</p>
         <div class="relative h-80">
           <canvas id="categoryComparisonChart"></canvas>
         </div>
@@ -71,14 +71,14 @@
 
       <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
         <div>
-          <h3 class="font-semibold text-slate-800 text-lg">Distribución de Ventas</h3>
-          <p class="text-xs text-slate-400 mb-4">Participación por categoría</p>
+          <h3 class="font-semibold text-slate-800 text-lg">Participación en Ventas</h3>
+          <p class="text-xs text-slate-400 mb-4">% Facturado por categoría</p>
         </div>
         <div class="relative h-64 flex items-center justify-center">
           <canvas id="categoryDonutChart"></canvas>
         </div>
-        <div id="lastUpdateText" class="mt-4 pt-3 border-t border-slate-100 text-center text-xs text-slate-400">
-          Última actualización: --
+        <div id="syncTimeMsg" class="mt-4 pt-3 border-t border-slate-100 text-center text-xs text-slate-400">
+          Esperando sincronización...
         </div>
       </div>
     </section>
@@ -86,7 +86,7 @@
     <!-- Tabla Detallada -->
     <section class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
       <div class="px-6 py-4 border-b border-slate-200 bg-slate-50/60">
-        <h3 class="font-semibold text-slate-800 text-base">Desglose Detallado por Línea</h3>
+        <h3 class="font-semibold text-slate-800 text-base">Desglose Detallado por Categoría</h3>
       </div>
       <div class="overflow-x-auto">
         <table class="w-full text-left text-sm">
@@ -116,11 +116,12 @@
   </div>
 
   <script>
-    // PEGA AQUÍ LA URL QUE TE DIO APPS SCRIPT AL IMPLEMENTAR
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxeEhTkMOMlUD-lfPkFE1NHOfyqpHBgAXeJfag74BfqhApBXrZydXfazlKuq0rPMcnOzA/exec";
+    // ID extraído de la URL oficial de la hoja compartida
+    const SPREADSHEET_ID = "1JR9Xo_dcxOJqj_CMeV5mBNIE2aXCXFPVtwTku631ipc";
+    const SHEET_NAME = "Dashboard";
 
-    // Respaldo inmediato mientras conecta
-    const fallbackCategories = [
+    // Datos de respaldo por si el navegador no tiene internet
+    const fallbackData = [
       { name: 'ACCESORIOS', qty: 44, facturado: 31234.54, ganancia: 4733.45, margen: 15.15 },
       { name: 'REPUESTOS', qty: 376, facturado: 19896.93, ganancia: 8307.29, margen: 41.75 },
       { name: 'APPAREL', qty: 102, facturado: 19244.01, ganancia: 5409.51, margen: 28.11 },
@@ -136,8 +137,8 @@
       barChart = new Chart(ctxBar, {
         type: 'bar',
         data: { labels: [], datasets: [
-          { label: 'Monto Facturado ($)', data: [], backgroundColor: '#3b82f6', borderRadius: 6 },
-          { label: 'Ganancia Total ($)', data: [], backgroundColor: '#10b981', borderRadius: 6 }
+          { label: 'Facturado ($)', data: [], backgroundColor: '#3b82f6', borderRadius: 6 },
+          { label: 'Ganancia ($)', data: [], backgroundColor: '#10b981', borderRadius: 6 }
         ]},
         options: {
           responsive: true, maintainAspectRatio: false,
@@ -153,7 +154,7 @@
       });
     }
 
-    function renderUI(categories, updatedAt = null) {
+    function renderUI(categories) {
       const tbody = document.getElementById('tableBody');
       tbody.innerHTML = '';
 
@@ -199,47 +200,78 @@
       donutChart.data.labels = categories.map(c => c.name);
       donutChart.data.datasets[0].data = categories.map(c => c.facturado);
       donutChart.update();
-
-      if (updatedAt) {
-        document.getElementById('lastUpdateText').innerText = 'Sincronizado: ' + updatedAt;
-      }
     }
 
-    async function loadLiveData() {
-      const badge = document.getElementById('syncBadge');
-      if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes("PEGA_AQUI")) {
-        renderUI(fallbackCategories);
-        badge.className = "inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800";
-        badge.innerHTML = "● Datos Base";
-        return;
-      }
-
+    async function fetchLiveData() {
+      const badge = document.getElementById('syncStatus');
+      const timeMsg = document.getElementById('syncTimeMsg');
       badge.className = "inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800";
       badge.innerHTML = "● Sincronizando con Sheet...";
 
+      // Consulta directa a la API de Visualización de Google Sheets (gviz)
+      const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}&t=${Date.now()}`;
+
       try {
-        const res = await fetch(APPS_SCRIPT_URL);
-        const data = await res.json();
-        if (data.categories && data.categories.length > 0) {
-          renderUI(data.categories, data.updatedAt);
+        const response = await fetch(url);
+        const text = await response.text();
+        
+        // Google devuelve: /*O_o*/ google.visualization.Query.setResponse({...});
+        const jsonString = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
+        const json = JSON.parse(jsonString);
+        const rows = json.table.rows;
+
+        const categories = [];
+
+        // En la pestaña Dashboard:
+        // Columna H (índice 7): Categoria
+        // Columna I (índice 8): Cantidad
+        // Columna J (índice 9): Monto Facturado
+        // Columna K (índice 10): Ganancia
+        // Columna L (índice 11): Margen %
+        rows.forEach(r => {
+          const cells = r.c;
+          if (cells && cells[7] && cells[7].v) {
+            const catName = String(cells[7].v).trim();
+            if (catName && catName !== "Categoria" && !catName.toLowerCase().includes("total")) {
+              const qty = Number(cells[8] ? cells[8].v : 0) || 0;
+              const facturado = Number(cells[9] ? cells[9].v : 0) || 0;
+              const ganancia = Number(cells[10] ? cells[10].v : 0) || 0;
+              let margen = Number(cells[11] ? cells[11].v : 0) || 0;
+              if (margen < 1 && margen > 0) margen = margen * 100;
+
+              categories.push({
+                name: catName,
+                qty: qty,
+                facturado: facturado,
+                ganancia: ganancia,
+                margen: margen > 0 ? margen : (facturado > 0 ? (ganancia / facturado) * 100 : 0)
+              });
+            }
+          }
+        });
+
+        if (categories.length > 0) {
+          renderUI(categories);
+          const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
           badge.className = "inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800";
-          badge.innerHTML = "● En vivo y guardado";
+          badge.innerHTML = "● En Vivo (Sincronizado)";
+          timeMsg.innerText = "Última sincronización: " + now;
         } else {
-          renderUI(fallbackCategories);
+          renderUI(fallbackData);
         }
       } catch (err) {
-        console.error("Error al conectar:", err);
-        renderUI(fallbackCategories);
+        console.error("Error al obtener datos en vivo:", err);
+        renderUI(fallbackData);
         badge.className = "inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800";
-        badge.innerHTML = "● Modo Offline";
+        badge.innerHTML = "● Datos Base (Offline)";
       }
     }
 
     window.onload = () => {
       initCharts();
-      loadLiveData();
-      // Sondea cambios automáticamente cada 60 segundos
-      setInterval(loadLiveData, 60000);
+      fetchLiveData();
+      // Vuelve a consultar la hoja de cálculo automáticamente cada 30 segundos
+      setInterval(fetchLiveData, 30000);
     };
   </script>
 </body>

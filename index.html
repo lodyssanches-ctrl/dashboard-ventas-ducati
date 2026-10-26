@@ -40,13 +40,13 @@
           Actualizar ahora
         </button>
         <button onclick="window.print()" class="no-print px-4 py-2 text-sm font-semibold bg-blue-600 text-white rounded-lg shadow-sm hover:bg-blue-500 transition flex items-center gap-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
           Imprimir / PDF
         </button>
       </div>
     </header>
 
-    <!-- SELECTOR DE MES (TODOS LOS ENCABEZADOS DE MESES FIJOS EN HTML) -->
+    <!-- SELECTOR DE MES (ENCABEZADOS FIJOS) -->
     <section class="bg-slate-950 p-5 rounded-xl border border-slate-800 shadow-sm space-y-3">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
@@ -58,7 +58,6 @@
         </span>
       </div>
       
-      <!-- Botonera fija de meses -->
       <div class="flex flex-wrap items-center gap-2 pt-1 no-print" id="monthButtonsContainer">
         <button onclick="selectMonth('ALL')" id="monthBtn_ALL" class="month-btn px-3.5 py-1.5 text-xs font-bold rounded-lg transition bg-blue-600 text-white shadow-sm">
           Todos los Meses
@@ -429,7 +428,7 @@
       9: [
         { name: 'ACCESORIOS', qty: 12, facturado: 9500.00, ganancia: 2200.00, margen: 23.16 },
         { name: 'REPUESTOS', qty: 68, facturado: 2483.09, ganancia: 907.11, margen: 36.53 },
-        { name: 'MANO DE OBRA', qty: 40, p_qty: 40, facturado: 1500.00, ganancia: 800.00, margen: 53.33 },
+        { name: 'MANO DE OBRA', qty: 40, facturado: 1500.00, ganancia: 800.00, margen: 53.33 },
         { name: 'APPAREL', qty: 9, facturado: 1200.00, ganancia: 420.00, margen: 35.00 }
       ],
       10: [
@@ -517,6 +516,41 @@
         .replace(',', '.');
       const num = Number(str);
       return isNaN(num) ? 0 : num;
+    }
+
+    // Extracción segura del mes soportando cadenas, seriales u objetos Date
+    function extractMonthNumber(cell) {
+      if (!cell) return null;
+      if (cell.v instanceof Date) {
+        return cell.v.getMonth() + 1;
+      }
+      const val = cell.v !== undefined ? cell.v : cell;
+      if (typeof val === 'number') {
+        if (val >= 1 && val <= 12) return val;
+        // Serial de fecha de Excel / Google Sheets
+        if (val > 40000 && val < 60000) {
+          const jsDate = new Date((val - 25569) * 86400 * 1000);
+          return jsDate.getUTCMonth() + 1;
+        }
+      }
+      const str = String(cell.f || val || '').trim();
+      const matchDateObj = str.match(/Date\((\d+),(\d+),(\d+)/);
+      if (matchDateObj) {
+        return parseInt(matchDateObj[2], 10) + 1;
+      }
+      // Formato YYYY-MM-DD
+      const isoMatch = str.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+      if (isoMatch) {
+        const m = parseInt(isoMatch[2], 10);
+        if (m >= 1 && m <= 12) return m;
+      }
+      // Formato DD/MM/YYYY
+      const latMatch = str.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{2,4})/);
+      if (latMatch) {
+        const m = parseInt(latMatch[2], 10);
+        if (m >= 1 && m <= 12) return m;
+      }
+      return null;
     }
 
     function selectMonth(mIndex) {
@@ -914,7 +948,7 @@
       document.body.appendChild(script);
     }
 
-    // Ingesta dinámica desde la pestaña Ventas
+    // Ingesta dinámica y recalculo mensual
     window.handleLiveVentas = function(json) {
       if (!json || !json.table || !json.table.rows) return;
       const rows = json.table.rows;
@@ -998,16 +1032,8 @@
         categoryTotals[catKey].facturado += fact;
         categoryTotals[catKey].ganancia += profit;
 
-        const fechaCell = cells[idxFecha];
-        let mesNum = 1;
-        if (fechaCell && fechaCell.v) {
-          const strFecha = String(fechaCell.v);
-          const parts = strFecha.split(/[\/\-]/);
-          if (parts.length >= 2) {
-            const m = parseInt(parts[1]);
-            if (!isNaN(m) && m >= 1 && m <= 12) mesNum = m;
-          }
-        }
+        // Detección universal del mes
+        const mesNum = extractMonthNumber(cells[idxFecha]) || 1;
 
         if (!monthTotals[mesNum]) {
           monthTotals[mesNum] = { mes: mesNum, label: monthNames[mesNum - 1] || `Mes ${mesNum}`, qty: 0, facturado: 0, ganancia: 0 };
@@ -1052,26 +1078,51 @@
           margen: c.facturado > 0 ? (c.ganancia / c.facturado) * 100 : 0
         }));
 
+        // Actualizar matriz mensual de categorías
+        Object.keys(newMonthlyMatrix).forEach(m => {
+          monthlyCategoryMatrix[m] = Object.values(newMonthlyMatrix[m]).map(c => ({
+            ...c,
+            margen: c.facturado > 0 ? (c.ganancia / c.facturado) * 100 : 0
+          }));
+        });
+
         if (selectedMonth === 'ALL') {
           renderCategories(initialCategories);
         } else {
-          const activeMatrix = newMonthlyMatrix[selectedMonth] || {};
-          renderCategories(Object.values(activeMatrix).map(c => ({
-            ...c,
-            margen: c.facturado > 0 ? (c.ganancia / c.facturado) * 100 : 0
-          })));
+          const activeMatrix = monthlyCategoryMatrix[selectedMonth] || [];
+          renderCategories(activeMatrix);
         }
 
-        monthlyData = Object.values(monthTotals).sort((a, b) => a.mes - b.mes).map(m => ({
-          ...m,
-          margen: m.facturado > 0 ? (m.ganancia / m.facturado) * 100 : 0
-        }));
+        // Actualización directa del gráfico mensual
+        const updatedMonthlyList = [];
+        for (let m = 1; m <= 10; m++) {
+          if (monthTotals[m]) {
+            const mFact = monthTotals[m].facturado;
+            const mProf = monthTotals[m].ganancia;
+            updatedMonthlyList.push({
+              mes: m,
+              label: monthNames[m - 1],
+              qty: monthTotals[m].qty,
+              facturado: mFact,
+              ganancia: mProf,
+              margen: mFact > 0 ? (mProf / mFact) * 100 : 0
+            });
+          } else {
+            // Conservar el mes base si no tiene transacciones en esta iteración
+            const fallback = monthlyData.find(d => d.mes === m);
+            if (fallback) updatedMonthlyList.push(fallback);
+          }
+        }
 
-        monthlyChart.data.labels = monthlyData.map(d => d.label);
-        monthlyChart.data.datasets[0].data = monthlyData.map(d => d.facturado);
-        monthlyChart.data.datasets[1].data = monthlyData.map(d => d.ganancia);
-        monthlyChart.data.datasets[2].data = monthlyData.map(d => d.margen);
-        monthlyChart.update();
+        monthlyData = updatedMonthlyList;
+
+        if (monthlyChart) {
+          monthlyChart.data.labels = monthlyData.map(d => d.label);
+          monthlyChart.data.datasets[0].data = monthlyData.map(d => d.facturado);
+          monthlyChart.data.datasets[1].data = monthlyData.map(d => d.ganancia);
+          monthlyChart.data.datasets[2].data = monthlyData.map(d => d.margen);
+          monthlyChart.update();
+        }
 
         ['ACCESORIOS', 'REPUESTOS', 'APPAREL'].forEach(key => {
           const liveItems = Object.values(maps[key]);

@@ -40,13 +40,13 @@
           Actualizar ahora
         </button>
         <button onclick="window.print()" class="no-print px-4 py-2 text-sm font-semibold bg-blue-600 text-white rounded-lg shadow-sm hover:bg-blue-500 transition flex items-center gap-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
           Imprimir / PDF
         </button>
       </div>
     </header>
 
-    <!-- SELECTOR DE MES (Encabezados interactivos) -->
+    <!-- SELECTOR DE MES (TODOS LOS ENCABEZADOS DE MESES FIJOS EN HTML) -->
     <section class="bg-slate-950 p-5 rounded-xl border border-slate-800 shadow-sm space-y-3">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
@@ -57,32 +57,68 @@
           Viendo: Todo el Año (Acumulado)
         </span>
       </div>
-      <div class="flex flex-wrap items-center gap-2 pt-1 no-print" id="monthButtonsContainer"></div>
+      
+      <!-- Botonera fija de meses -->
+      <div class="flex flex-wrap items-center gap-2 pt-1 no-print" id="monthButtonsContainer">
+        <button onclick="selectMonth('ALL')" id="monthBtn_ALL" class="month-btn px-3.5 py-1.5 text-xs font-bold rounded-lg transition bg-blue-600 text-white shadow-sm">
+          Todos los Meses
+        </button>
+        <button onclick="selectMonth(1)" id="monthBtn_1" class="month-btn px-3.5 py-1.5 text-xs font-medium rounded-lg transition bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800">
+          Enero
+        </button>
+        <button onclick="selectMonth(2)" id="monthBtn_2" class="month-btn px-3.5 py-1.5 text-xs font-medium rounded-lg transition bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800">
+          Febrero
+        </button>
+        <button onclick="selectMonth(3)" id="monthBtn_3" class="month-btn px-3.5 py-1.5 text-xs font-medium rounded-lg transition bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800">
+          Marzo
+        </button>
+        <button onclick="selectMonth(4)" id="monthBtn_4" class="month-btn px-3.5 py-1.5 text-xs font-medium rounded-lg transition bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800">
+          Abril
+        </button>
+        <button onclick="selectMonth(5)" id="monthBtn_5" class="month-btn px-3.5 py-1.5 text-xs font-medium rounded-lg transition bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800">
+          Mayo
+        </button>
+        <button onclick="selectMonth(6)" id="monthBtn_6" class="month-btn px-3.5 py-1.5 text-xs font-medium rounded-lg transition bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800">
+          Junio
+        </button>
+        <button onclick="selectMonth(7)" id="monthBtn_7" class="month-btn px-3.5 py-1.5 text-xs font-medium rounded-lg transition bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800">
+          Julio
+        </button>
+        <button onclick="selectMonth(8)" id="monthBtn_8" class="month-btn px-3.5 py-1.5 text-xs font-medium rounded-lg transition bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800">
+          Agosto
+        </button>
+        <button onclick="selectMonth(9)" id="monthBtn_9" class="month-btn px-3.5 py-1.5 text-xs font-medium rounded-lg transition bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800">
+          Septiembre
+        </button>
+        <button onclick="selectMonth(10)" id="monthBtn_10" class="month-btn px-3.5 py-1.5 text-xs font-medium rounded-lg transition bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800">
+          Octubre
+        </button>
+      </div>
     </section>
 
     <!-- TARJETAS DE KPIS GENERALES -->
     <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 shadow-sm">
         <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Facturado Total</p>
-        <h2 class="text-2xl font-bold text-white mt-1" id="kpiFacturado">$88.602,48</h2>
+        <h2 class="text-2xl font-bold text-white mt-1" id="kpiFacturado">$88.962,48</h2>
         <span class="text-xs text-blue-400 font-medium" id="kpiFacturadoSub">Total acumulado</span>
       </div>
 
       <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 shadow-sm">
         <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Ganancia Total</p>
-        <h2 class="text-2xl font-bold text-emerald-400 mt-1" id="kpiGanancia">$25.968,66</h2>
+        <h2 class="text-2xl font-bold text-emerald-400 mt-1" id="kpiGanancia">$26.291,05</h2>
         <span class="text-xs text-emerald-500 font-medium" id="kpiGananciaSub">Utilidad operativa</span>
       </div>
 
       <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 shadow-sm">
         <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Margen Promedio</p>
-        <h2 class="text-2xl font-bold text-indigo-400 mt-1" id="kpiMargen">29,31%</h2>
+        <h2 class="text-2xl font-bold text-indigo-400 mt-1" id="kpiMargen">29,55%</h2>
         <span class="text-xs text-slate-400 font-medium" id="kpiMargenSub">Rentabilidad sobre ventas</span>
       </div>
 
       <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 shadow-sm">
         <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Unidades / Servicios</p>
-        <h2 class="text-2xl font-bold text-white mt-1" id="kpiCantidad">693,1</h2>
+        <h2 class="text-2xl font-bold text-white mt-1" id="kpiCantidad">699,1</h2>
         <span class="text-xs text-slate-400 font-medium" id="kpiCantidadSub">Volumen facturado</span>
       </div>
     </section>
@@ -298,7 +334,7 @@
       </div>
     </section>
 
-    <!-- TABLA DESGLOSE POR CATEGORÍA (Se adapta al mes seleccionado) -->
+    <!-- TABLA DESGLOSE POR CATEGORÍA -->
     <section class="bg-slate-950 rounded-xl border border-slate-800 shadow-sm overflow-hidden">
       <div class="px-6 py-4 border-b border-slate-800 bg-slate-900/60 flex justify-between items-center">
         <h3 class="font-semibold text-white text-base">Desglose Detallado por Categoría</h3>
@@ -319,10 +355,10 @@
           <tfoot class="bg-slate-900 font-bold border-t-2 border-slate-800">
             <tr>
               <td class="py-3 px-6 text-white">TOTAL</td>
-              <td class="py-3 px-6 text-center text-slate-300" id="totalQty">693,1</td>
-              <td class="py-3 px-6 text-right text-slate-300" id="totalFact">$88.602,48</td>
-              <td class="py-3 px-6 text-right text-emerald-400" id="totalProfit">$25.968,66</td>
-              <td class="py-3 px-6 text-center text-indigo-400" id="totalMargin">29,31%</td>
+              <td class="py-3 px-6 text-center text-slate-300" id="totalQty">699,1</td>
+              <td class="py-3 px-6 text-right text-slate-300" id="totalFact">$88.962,48</td>
+              <td class="py-3 px-6 text-right text-emerald-400" id="totalProfit">$26.291,05</td>
+              <td class="py-3 px-6 text-center text-indigo-400" id="totalMargin">29,55%</td>
             </tr>
           </tfoot>
         </table>
@@ -341,8 +377,7 @@
       "Junio", "Julio", "Agosto", "Septiembre", "Octubre"
     ];
 
-    // Matriz completa de categorías por mes consolidada de la hoja
-    const monthlyCategoryMatrix = {
+    let monthlyCategoryMatrix = {
       1: [
         { name: 'REPUESTOS', qty: 31, facturado: 819.00, ganancia: 508.92, margen: 62.14 },
         { name: 'APPAREL', qty: 6, facturado: 317.20, ganancia: 138.87, margen: 43.78 },
@@ -394,18 +429,17 @@
       9: [
         { name: 'ACCESORIOS', qty: 12, facturado: 9500.00, ganancia: 2200.00, margen: 23.16 },
         { name: 'REPUESTOS', qty: 68, facturado: 2483.09, ganancia: 907.11, margen: 36.53 },
-        { name: 'MANO DE OBRA', qty: 40, facturado: 1500.00, ganancia: 800.00, margen: 53.33 },
+        { name: 'MANO DE OBRA', qty: 40, p_qty: 40, facturado: 1500.00, ganancia: 800.00, margen: 53.33 },
         { name: 'APPAREL', qty: 9, facturado: 1200.00, ganancia: 420.00, margen: 35.00 }
       ],
       10: [
-        { name: 'ACCESORIOS', qty: 21, facturado: 6903.42, ganancia: 1090.35, margen: 15.79 },
+        { name: 'ACCESORIOS', qty: 26, facturado: 7203.42, ganancia: 1390.35, margen: 19.30 },
         { name: 'MANO DE OBRA', qty: 20, facturado: 1788.00, ganancia: 873.20, margen: 48.84 },
         { name: 'REPUESTOS', qty: 23, facturado: 945.85, ganancia: 380.24, margen: 40.20 },
         { name: 'APPAREL', qty: 5, facturado: 723.21, ganancia: 240.00, margen: 33.19 }
       ]
     };
 
-    // Datos mensuales consolidados
     let monthlyData = [
       { mes: 1, label: "Enero", qty: 39, facturado: 1774.20, ganancia: 864.74, margen: 48.74 },
       { mes: 2, label: "Febrero", qty: 45, facturado: 4624.40, ganancia: 2011.84, margen: 43.50 },
@@ -416,13 +450,13 @@
       { mes: 7, label: "Julio", qty: 109, facturado: 23181.86, ganancia: 4100.01, margen: 17.69 },
       { mes: 8, label: "Agosto", qty: 83.6, facturado: 6811.15, ganancia: 2406.03, margen: 35.32 },
       { mes: 9, label: "Septiembre", qty: 129.05, facturado: 14683.09, ganancia: 4327.11, margen: 29.47 },
-      { mes: 10, label: "Octubre", qty: 26, facturado: 9356.97, ganancia: 2195.59, margen: 23.47 }
+      { mes: 10, label: "Octubre", qty: 31, facturado: 9656.97, ganancia: 2495.59, margen: 25.84 }
     ];
 
     let selectedMonth = 'ALL';
 
-    const initialCategories = [
-      { name: 'ACCESORIOS', qty: 54, facturado: 36073.54, ganancia: 5717.87, margen: 15.85 },
+    let initialCategories = [
+      { name: 'ACCESORIOS', qty: 59, facturado: 36373.54, ganancia: 6017.87, margen: 16.54 },
       { name: 'REPUESTOS', qty: 376, facturado: 19896.93, ganancia: 8307.29, margen: 41.75 },
       { name: 'APPAREL', qty: 102, facturado: 19244.01, ganancia: 5409.51, margen: 28.11 },
       { name: 'MANO DE OBRA', qty: 161.1, facturado: 13388.00, ganancia: 6473.20, margen: 48.35 }
@@ -485,37 +519,17 @@
       return isNaN(num) ? 0 : num;
     }
 
-    // Renderizar botones de los 10 meses inmediatamente
-    function renderMonthButtons() {
-      const container = document.getElementById('monthButtonsContainer');
-      if (!container) return;
-      container.innerHTML = `
-        <button onclick="selectMonth('ALL')" id="monthBtn_ALL" class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition bg-blue-600 text-white shadow-sm">
-          Todos los Meses
-        </button>
-      `;
-
-      monthlyData.forEach(m => {
-        container.innerHTML += `
-          <button onclick="selectMonth(${m.mes})" id="monthBtn_${m.mes}" class="px-3.5 py-1.5 text-xs font-medium rounded-lg transition bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800">
-            ${m.label}
-          </button>
-        `;
-      });
-    }
-
-    // Filtro interactivo de mes que recalcula todas las categorías
     function selectMonth(mIndex) {
       selectedMonth = mIndex;
 
       const allBtns = document.querySelectorAll('#monthButtonsContainer button');
       allBtns.forEach(btn => {
-        btn.className = "px-3.5 py-1.5 text-xs font-medium rounded-lg transition bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800";
+        btn.className = "month-btn px-3.5 py-1.5 text-xs font-medium rounded-lg transition bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800";
       });
 
       const activeBtn = document.getElementById('monthBtn_' + mIndex);
       if (activeBtn) {
-        activeBtn.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg transition bg-blue-600 text-white shadow-sm";
+        activeBtn.className = "month-btn px-3.5 py-1.5 text-xs font-bold rounded-lg transition bg-blue-600 text-white shadow-sm";
       }
 
       const labelEl = document.getElementById('currentMonthLabel');
@@ -545,7 +559,6 @@
           updateKPIs(item.facturado, item.ganancia, item.margen, item.qty, `Mes ${item.mes}`);
           renderPeriodDetail(item);
 
-          // Actualizar categorías específicas de ese mes
           const monthCats = monthlyCategoryMatrix[mIndex] || [];
           renderCategories(monthCats);
         }
@@ -837,7 +850,6 @@
       topProductsChart.update();
     }
 
-    // Renderizar categorías y actualizar los dos gráficos asociados
     function renderCategories(categories) {
       const tbody = document.getElementById('tableBody');
       if (!tbody) return;
@@ -872,7 +884,6 @@
         `;
       });
 
-      // Pie de tabla
       document.getElementById('totalQty').innerText = catTotQty.toLocaleString('es-ES');
       document.getElementById('totalFact').innerText = formatCurrency(catTotFact);
       document.getElementById('totalProfit').innerText = formatCurrency(catTotProf);
@@ -903,14 +914,15 @@
       document.body.appendChild(script);
     }
 
+    // Ingesta dinámica desde la pestaña Ventas
     window.handleLiveVentas = function(json) {
       if (!json || !json.table || !json.table.rows) return;
       const rows = json.table.rows;
       if (rows.length === 0) return;
 
-      let idxDesc = 3, idxCat = 4, idxFecha = 6, idxQty = 7, idxFact = 10, idxProfit = 11, idxPercent = 12;
+      let idxDesc = -1, idxCat = -1, idxFecha = -1, idxQty = -1, idxFact = -1, idxProfit = -1, idxPercent = -1;
 
-      for (let r = 0; r < Math.min(20, rows.length); r++) {
+      for (let r = 0; r < Math.min(25, rows.length); r++) {
         const cells = rows[r].c;
         if (!cells) continue;
         cells.forEach((cell, i) => {
@@ -924,9 +936,23 @@
           if (val.includes('ganancia') && !val.includes('%')) idxProfit = i;
           if (val.includes('%') || val.includes('margen')) idxPercent = i;
         });
+        if (idxDesc !== -1 && idxFact !== -1) break;
       }
 
+      if (idxDesc === -1) idxDesc = 3;
+      if (idxCat === -1) idxCat = 4;
+      if (idxFecha === -1) idxFecha = 6;
+      if (idxQty === -1) idxQty = 7;
+      if (idxFact === -1) idxFact = 10;
+      if (idxProfit === -1) idxProfit = 11;
+      if (idxPercent === -1) idxPercent = 12;
+
       const maps = { ACCESORIOS: {}, REPUESTOS: {}, APPAREL: {} };
+      const categoryTotals = {};
+      const monthTotals = {};
+      const newMonthlyMatrix = {};
+
+      let globalFact = 0, globalProfit = 0, globalQty = 0;
 
       rows.forEach(r => {
         const cells = r.c;
@@ -957,7 +983,46 @@
           catKey = 'APPAREL';
         } else if (rawCat.includes('REPUESTO') || descUpper.includes('FILTRO') || descUpper.includes('BUJIA') || descUpper.includes('ARANDELA') || descUpper.includes('JUNTA') || descUpper.includes('LEVA') || descUpper.includes('DISCO') || descUpper.startsWith('ACEITE')) {
           catKey = 'REPUESTOS';
+        } else if (rawCat.includes('OBRA') || rawCat.includes('TALLER') || descUpper.includes('MANO DE OBRA') || descUpper.includes('DIAGNOSTIC') || descUpper.includes('DDS')) {
+          catKey = 'MANO DE OBRA';
         }
+
+        globalFact += fact;
+        globalProfit += profit;
+        globalQty += qty;
+
+        if (!categoryTotals[catKey]) {
+          categoryTotals[catKey] = { name: catKey, qty: 0, facturado: 0, ganancia: 0 };
+        }
+        categoryTotals[catKey].qty += qty;
+        categoryTotals[catKey].facturado += fact;
+        categoryTotals[catKey].ganancia += profit;
+
+        const fechaCell = cells[idxFecha];
+        let mesNum = 1;
+        if (fechaCell && fechaCell.v) {
+          const strFecha = String(fechaCell.v);
+          const parts = strFecha.split(/[\/\-]/);
+          if (parts.length >= 2) {
+            const m = parseInt(parts[1]);
+            if (!isNaN(m) && m >= 1 && m <= 12) mesNum = m;
+          }
+        }
+
+        if (!monthTotals[mesNum]) {
+          monthTotals[mesNum] = { mes: mesNum, label: monthNames[mesNum - 1] || `Mes ${mesNum}`, qty: 0, facturado: 0, ganancia: 0 };
+        }
+        monthTotals[mesNum].qty += qty;
+        monthTotals[mesNum].facturado += fact;
+        monthTotals[mesNum].ganancia += profit;
+
+        if (!newMonthlyMatrix[mesNum]) newMonthlyMatrix[mesNum] = {};
+        if (!newMonthlyMatrix[mesNum][catKey]) {
+          newMonthlyMatrix[mesNum][catKey] = { name: catKey, qty: 0, facturado: 0, ganancia: 0 };
+        }
+        newMonthlyMatrix[mesNum][catKey].qty += qty;
+        newMonthlyMatrix[mesNum][catKey].facturado += fact;
+        newMonthlyMatrix[mesNum][catKey].ganancia += profit;
 
         const isEngineOil = descUpper.startsWith('ACEITE') || descUpper.includes('MOTUL 7100') || descUpper.includes('MOTUL 300V') || descUpper.includes('MOTUL 5100');
         if (!isEngineOil && maps[catKey]) {
@@ -973,23 +1038,59 @@
         }
       });
 
-      ['ACCESORIOS', 'REPUESTOS', 'APPAREL'].forEach(key => {
-        const liveItems = Object.values(maps[key]);
-        if (liveItems.length > 0) {
-          categoryCatalogs[key] = liveItems.map(p => {
-            const calculated = p.facturado > 0 ? (p.ganancia / p.facturado) * 100 : 0;
-            const finalMargen = (p.percentCol > 0 && isFinite(p.percentCol)) ? p.percentCol : calculated;
-            return { ...p, margen: isFinite(finalMargen) ? finalMargen : 0 };
-          });
-        }
-      });
-      renderCurrentRanking();
+      if (globalFact > 0) {
+        const avgMargen = (globalProfit / globalFact) * 100;
+        updateKPIs(globalFact, globalProfit, avgMargen, globalQty, "Total acumulado anual");
 
-      const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      const badge = document.getElementById('syncStatus');
-      badge.className = "inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950 text-emerald-400 border border-emerald-800";
-      badge.innerHTML = "● En Vivo (Sincronizado)";
-      document.getElementById('syncTimeMsg').innerText = "Última sincronización: " + now;
+        document.getElementById('totalQty').innerText = globalQty.toLocaleString('es-ES');
+        document.getElementById('totalFact').innerText = formatCurrency(globalFact);
+        document.getElementById('totalProfit').innerText = formatCurrency(globalProfit);
+        document.getElementById('totalMargin').innerText = avgMargen.toFixed(2) + '%';
+
+        initialCategories = Object.values(categoryTotals).map(c => ({
+          ...c,
+          margen: c.facturado > 0 ? (c.ganancia / c.facturado) * 100 : 0
+        }));
+
+        if (selectedMonth === 'ALL') {
+          renderCategories(initialCategories);
+        } else {
+          const activeMatrix = newMonthlyMatrix[selectedMonth] || {};
+          renderCategories(Object.values(activeMatrix).map(c => ({
+            ...c,
+            margen: c.facturado > 0 ? (c.ganancia / c.facturado) * 100 : 0
+          })));
+        }
+
+        monthlyData = Object.values(monthTotals).sort((a, b) => a.mes - b.mes).map(m => ({
+          ...m,
+          margen: m.facturado > 0 ? (m.ganancia / m.facturado) * 100 : 0
+        }));
+
+        monthlyChart.data.labels = monthlyData.map(d => d.label);
+        monthlyChart.data.datasets[0].data = monthlyData.map(d => d.facturado);
+        monthlyChart.data.datasets[1].data = monthlyData.map(d => d.ganancia);
+        monthlyChart.data.datasets[2].data = monthlyData.map(d => d.margen);
+        monthlyChart.update();
+
+        ['ACCESORIOS', 'REPUESTOS', 'APPAREL'].forEach(key => {
+          const liveItems = Object.values(maps[key]);
+          if (liveItems.length > 0) {
+            categoryCatalogs[key] = liveItems.map(p => {
+              const calculated = p.facturado > 0 ? (p.ganancia / p.facturado) * 100 : 0;
+              const finalMargen = (p.percentCol > 0 && isFinite(p.percentCol)) ? p.percentCol : calculated;
+              return { ...p, margen: isFinite(finalMargen) ? finalMargen : 0 };
+            });
+          }
+        });
+        renderCurrentRanking();
+
+        const badge = document.getElementById('syncStatus');
+        const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        badge.className = "inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950 text-emerald-400 border border-emerald-800";
+        badge.innerHTML = "● En Vivo (Sincronizado)";
+        document.getElementById('syncTimeMsg').innerText = "Última sincronización: " + now;
+      }
     };
 
     function fetchAllLiveData() {
@@ -999,14 +1100,12 @@
       fetchSheetJSONP('Ventas', 'handleLiveVentas');
     }
 
-    // Inicialización inmediata al abrir
     window.onload = () => {
       initCharts();
-      renderMonthButtons();
       selectMonth('ALL');
       selectCategory('ACCESORIOS');
       fetchAllLiveData();
-      setInterval(fetchAllLiveData, 20000); // Polling cada 20 segundos
+      setInterval(fetchAllLiveData, 15000); // Polling cada 15 segundos
     };
   </script>
 </body>
